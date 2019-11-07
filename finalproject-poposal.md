@@ -42,14 +42,7 @@ User : {
 }
 
 
-| Priority  | User  | Description  |
-|---|---|---|---|---|
-| P0  | Buyer  | I want to be able to buy discounted things from current listings. If there’s an item on the listing that I am interested in buying, I will contact the seller to discuss prices and such.   |
-| P1  | Seller  | I want to sell things that I don’t need anymore to make some extra cash on current listings. If there’s a buyer who is interested, we can message each other to get the contact information and negotiate prices.   |
-| P2  | Buyer  | I want to favorite listings that I see are on sale|
-| P3  |  Seller | I want to edit or delete an existing listing of mine |
-
-
+![table](table.png)
 
 
 
