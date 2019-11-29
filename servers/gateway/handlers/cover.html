@@ -1,0 +1,637 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">assignments-thebriando/servers/gateway/handlers/auth.go (93.1%)</option>
+				
+				<option value="file1">assignments-thebriando/servers/gateway/handlers/context.go (100.0%)</option>
+				
+				<option value="file2">assignments-thebriando/servers/gateway/handlers/cors.go (100.0%)</option>
+				
+				<option value="file3">assignments-thebriando/servers/gateway/handlers/summary.go (93.8%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package handlers
+
+import (
+        "assignments-thebriando/servers/gateway/models/users"
+        "assignments-thebriando/servers/gateway/sessions"
+        "encoding/json"
+        "io/ioutil"
+        "net/http"
+        "strconv"
+        "strings"
+        "time"
+)
+
+func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+
+        if r.Method == http.MethodPost </span><span class="cov8" title="1">{
+                header := strings.Split(r.Header.Get("Content-Type"), ",")
+                if header[0] != "application/json" </span><span class="cov8" title="1">{
+                        w.WriteHeader(http.StatusUnsupportedMediaType)
+                        w.Write([]byte("Request body must be in JSON"))
+                }</span> else<span class="cov8" title="1"> {
+                        body, _ := ioutil.ReadAll(r.Body)
+                        var newUser users.NewUser
+                        json.Unmarshal([]byte(body), &amp;newUser)
+                        if newUser.LastName == "" || newUser.FirstName == "" || newUser.Email == "" || newUser.PasswordConf == "" || newUser.Password == "" || newUser.UserName == "" </span><span class="cov8" title="1">{
+                                w.WriteHeader(http.StatusBadRequest)
+                        }</span> else<span class="cov8" title="1"> {
+                                userErr := newUser.Validate()
+                                if userErr != nil </span><span class="cov0" title="0">{
+                                        w.WriteHeader(http.StatusBadRequest)
+                                }</span> else<span class="cov8" title="1"> {
+                                        user, err := newUser.ToUser()
+                                        sessionState := SessionState{
+                                                SessionTime: time.Now(),
+                                                User:        *user,
+                                        }
+                                        sid, err := sessions.BeginSession(ctx.SigningKey, ctx.SessionStore, &amp;sessionState, w)
+                                        insertedUser, err := ctx.UserStore.Insert(user)
+                                        sessionState.User = *insertedUser
+                                        ctx.SessionStore.Save(sid, &amp;sessionState)
+                                        if err == nil </span><span class="cov8" title="1">{
+                                                w.Header().Set("Content-Type", "application/json")
+                                                w.Header().Set("Authorization", "Bearer "+sid.String())
+                                                profile, _ := json.Marshal(&amp;user)
+                                                w.WriteHeader(http.StatusCreated)
+                                                w.Write(profile)
+                                        }</span>
+                                }
+                        }
+                }
+        } else<span class="cov8" title="1"> {
+                w.WriteHeader(http.StatusMethodNotAllowed)
+        }</span>
+}
+
+func (ctx *Context) SpecificUserHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id := strings.TrimPrefix(r.URL.Path, "/v1/users/")
+
+        // check if auth header exists
+        // if not return http.unauth'ed error
+        if authBear := r.Header.Get("Authorization"); len(authBear) == 0 </span><span class="cov8" title="1">{
+                w.WriteHeader(http.StatusUnauthorized)
+                w.Write([]byte("Unauthorized"))
+        }</span> else<span class="cov8" title="1"> {
+
+                // The current user must be authenticated to call this handler regardless of HTTP method. If the user is not authenticated, respond immediately with an http.StatusUnauthorized (401) error status code
+
+                if r.Method != http.MethodGet &amp;&amp; r.Method != http.MethodPatch </span><span class="cov8" title="1">{
+                        w.WriteHeader(http.StatusMethodNotAllowed)
+                }</span> else<span class="cov8" title="1"> {
+                        if id == "me" </span><span class="cov8" title="1">{
+                                sessionID, err := sessions.GetSessionID(r, ctx.SigningKey)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        http.Error(w, err.Error(), 400)
+                                }</span>
+                                <span class="cov8" title="1">var currentUser users.User
+                                sessionState := SessionState{
+                                        SessionTime: time.Now(),
+                                        User:        currentUser,
+                                }
+                                ctx.SessionStore.Get(sessionID, &amp;sessionState)
+                                currentUser = sessionState.User
+
+                                id = strconv.FormatInt(currentUser.ID, 10)
+
+                                if strconv.FormatInt(currentUser.ID, 10) != id </span><span class="cov0" title="0">{
+                                        w.WriteHeader(http.StatusForbidden)
+                                        w.Write([]byte("Access forbidden"))
+                                }</span>
+                        }
+                        <span class="cov8" title="1">intID, _ := strconv.ParseInt(id, 10, 64)
+                        if r.Method == http.MethodGet </span><span class="cov8" title="1">{
+                                user, err := ctx.UserStore.GetByID(intID)
+                                if err != nil </span><span class="cov8" title="1">{
+                                        w.WriteHeader(http.StatusNotFound)
+                                        w.Write([]byte("No user found with given ID"))
+                                }</span> else<span class="cov8" title="1"> {
+                                        json, _ := json.Marshal(user)
+                                        w.Header().Set("Content-Type", "application/json")
+                                        w.Write(json)
+                                        w.WriteHeader(http.StatusOK)
+                                }</span>
+
+                        } else<span class="cov8" title="1"> if r.Method == http.MethodPatch </span><span class="cov8" title="1">{
+                                if !strings.Contains(r.Header.Get("Content-Type"), "application/json") </span><span class="cov0" title="0">{
+                                        w.WriteHeader(http.StatusUnsupportedMediaType)
+                                        w.Write([]byte("Request body must be in JSON"))
+                                }</span> else<span class="cov8" title="1"> {
+                                        var updates users.Updates
+                                        bodyMarshal, err := ioutil.ReadAll(r.Body)
+                                        if err == nil </span><span class="cov8" title="1">{
+                                                json.Unmarshal([]byte(bodyMarshal), &amp;updates)
+                                        }</span>
+                                        <span class="cov8" title="1">updatedUser, err := ctx.UserStore.Update(intID, &amp;updates)
+                                        w.Header().Set("Content-Type", "application/json")
+
+                                        userMarshal, err := json.Marshal(updatedUser)
+                                        if err == nil </span><span class="cov8" title="1">{
+                                                w.Write(userMarshal)
+                                        }</span>
+                                        <span class="cov8" title="1">w.WriteHeader(http.StatusOK)</span>
+                                }
+
+                        }
+                }
+        }
+}
+
+func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        if r.Method == http.MethodPost </span><span class="cov8" title="1">{
+                if !strings.Contains(r.Header.Get("Content-Type"), "application/json") </span><span class="cov8" title="1">{
+                        w.WriteHeader(http.StatusUnsupportedMediaType)
+                        w.Write([]byte("Request body must be in JSON"))
+                }</span>
+                <span class="cov8" title="1">var credentials users.Credentials
+
+                marshal, err := ioutil.ReadAll(r.Body)
+
+                if err == nil </span><span class="cov8" title="1">{
+                        json.Unmarshal([]byte(marshal), &amp;credentials)
+                        user, err := ctx.UserStore.GetByEmail(credentials.Email)
+                        if user == nil </span><span class="cov8" title="1">{
+                                time.Sleep(600 * time.Millisecond)
+                        }</span>
+                        <span class="cov8" title="1">if err != nil || user.Authenticate(credentials.Password) != nil </span><span class="cov8" title="1">{
+                                w.WriteHeader(http.StatusUnauthorized)
+                                w.Write([]byte("Invalid credentials"))
+                        }</span> else<span class="cov8" title="1"> {
+                                sessions.BeginSession(ctx.SigningKey, ctx.SessionStore, &amp;SessionState{}, w)
+                                headerIP := r.Header.Get("X-Forwarded-For")
+                                currentIP := r.RemoteAddr
+                                if len(headerIP) != 0 </span><span class="cov0" title="0">{
+                                        currentIP = headerIP
+                                }</span>
+                                <span class="cov8" title="1">strID := strconv.FormatInt(user.ID, 10)
+                                signIn := users.UserSignIn{
+                                        ID:         strID,
+                                        SignInTime: time.Now().String(),
+                                        IP:         currentIP,
+                                }
+                                ctx.UserStore.InsertSignIn(&amp;signIn)
+                                w.Header().Set("Content-Type", "application/json")
+                                w.WriteHeader(http.StatusCreated)
+                                w.Write(marshal)</span>
+                        }
+                }
+        } else<span class="cov8" title="1"> {
+                w.WriteHeader(http.StatusMethodNotAllowed)
+        }</span>
+}
+func (ctx *Context) SpecificSessionHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        mine := strings.TrimPrefix(r.URL.Path, "/v1/sessions/")
+        if r.Method == http.MethodDelete </span><span class="cov8" title="1">{
+                if mine != "mine" </span><span class="cov8" title="1">{
+                        w.WriteHeader(http.StatusForbidden)
+                        w.Write([]byte("Access forbidden"))
+
+                }</span> else<span class="cov8" title="1"> {
+                        sessions.EndSession(r, ctx.SigningKey, ctx.SessionStore)
+                        w.Write([]byte("Signed out"))
+                }</span>
+        } else<span class="cov8" title="1"> {
+                w.WriteHeader(http.StatusMethodNotAllowed)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package handlers
+
+import (
+        fakeusers "assignments-thebriando/servers/gateway/models/fake_users"
+        "assignments-thebriando/servers/gateway/models/users"
+        "assignments-thebriando/servers/gateway/sessions"
+        "time"
+)
+
+//TODO: define a handler context struct that
+//will be a receiver on any of your HTTP
+//handler functions that need access to
+//globals, such as the key used for signing
+//and verifying SessionIDs, the session store
+//and the user store
+
+type Context struct {
+        SigningKey   string
+        SessionStore sessions.Store
+        UserStore    users.Store
+}
+
+func InitializeFake() *Context <span class="cov8" title="1">{
+        sessStore := sessions.NewMemStore(time.Hour, time.Hour)
+        usrStore, _ := fakeusers.ConnectToFakeDB()
+        return &amp;Context{
+                SigningKey:   "test",
+                SessionStore: sessStore,
+                UserStore:    usrStore,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package handlers
+
+import (
+        "net/http"
+)
+
+/* TODO: implement a CORS middleware handler, as described
+in https://drstearns.github.io/tutorials/cors/ that responds
+with the following headers to all requests:
+
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, PUT, POST, PATCH, DELETE
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Access-Control-Expose-Headers: Authorization
+  Access-Control-Max-Age: 600
+*/
+type CorsHandler struct {
+        Handler http.Handler
+}
+
+func (c *CorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, POST, PATCH, DELETE")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+        w.Header().Set("Access-Control-Max-Age", "600")
+        c.Handler.ServeHTTP(w, r)
+}</span>
+
+func NewCors(handler http.Handler) http.Handler <span class="cov8" title="1">{
+        return &amp;CorsHandler{handler}
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package handlers
+
+import (
+        "encoding/json"
+        "errors"
+        "io"
+        "net/http"
+        "net/url"
+        "strconv"
+        "strings"
+
+        "golang.org/x/net/html"
+)
+
+//PreviewImage represents a preview image for a page
+type PreviewImage struct {
+        URL       string `json:"url,omitempty"`
+        SecureURL string `json:"secureURL,omitempty"`
+        Type      string `json:"type,omitempty"`
+        Width     int    `json:"width,omitempty"`
+        Height    int    `json:"height,omitempty"`
+        Alt       string `json:"alt,omitempty"`
+}
+
+//PageSummary represents summary properties for a web page
+type PageSummary struct {
+        Type        string          `json:"type,omitempty"`
+        URL         string          `json:"url,omitempty"`
+        Title       string          `json:"title,omitempty"`
+        SiteName    string          `json:"siteName,omitempty"`
+        Description string          `json:"description,omitempty"`
+        Author      string          `json:"author,omitempty"`
+        Keywords    []string        `json:"keywords,omitempty"`
+        Icon        *PreviewImage   `json:"icon,omitempty"`
+        Images      []*PreviewImage `json:"images,omitempty"`
+}
+
+const headerCORS = "Access-Control-Allow-Origin"
+const corsAnyOrigin = "*"
+
+//SummaryHandler handles requests for the page summary API.
+//This API expects one query string parameter named `url`,
+//which should contain a URL to a web page. It responds with
+//a JSON-encoded PageSummary struct containing the page summary
+//meta-data.
+func SummaryHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // TODO: add code and additional functions to do the following:
+        // - Add an HTTP header to the response with the name
+        //  `Access-Control-Allow-Origin` and a value of `*`. This will
+        //         allow cross-origin AJAX requests to your server.
+        w.Header().Add("Content-Type", "application/json")
+        w.Header().Add(headerCORS, corsAnyOrigin)
+        // - Get the `url` query string parameter value from the request.
+        //   If not supplied, respond with an http.StatusBadRequest error.
+        // - Call fetchHTML() to fetch the requested URL. See comments in that
+        //   function for more details.
+        url := r.URL.Query().Get("url")
+        if len(url) == 0 </span><span class="cov0" title="0">{
+                http.Error(w, `No url`, http.StatusBadRequest)
+        }</span>
+        // - Call extractSummary() to extract the page summary meta-data,
+        //   as directed in the assignment. See comments in that function
+        //   for more details
+        // - Close the response HTML stream so that you don't leak resources.
+        // - Finally, respond with a JSON-encoded version of the PageSummary
+        //   struct. That way the client can easily parse the JSON back into
+        //   an object. Remember to tell the client that the response content
+        //   type is JSON.
+        <span class="cov8" title="1">summary, err := fetchHTML(url)
+        if err != nil </span><span class="cov0" title="0">{
+                // w.Write([]byte("error: " + err.Error()))
+                if err.Error() == "404 not found" </span><span class="cov0" title="0">{
+                        http.Error(w, err.Error(), 404)
+                }</span>
+                <span class="cov0" title="0">if err.Error() == "Content-Type is not HTML" </span><span class="cov0" title="0">{
+                        http.Error(w, err.Error(), 415)
+                }</span>
+        } else<span class="cov8" title="1"> {
+                response, err := extractSummary(url, summary)
+
+                json.NewEncoder(w).Encode(response)
+
+                out, err := json.Marshal(response)
+                if err == nil </span><span class="cov8" title="1">{
+                        r.FormValue(string(out))
+                }</span>
+
+                // logger := log.New(os.Stdout, "htt: ", log.LstdFlags)
+                // logger.Println(url)
+        }
+        // Helpful Links:
+        // https://golang.org/pkg/net/http/#Request.FormValue
+        // https://golang.org/pkg/net/http/#Error
+        // https://golang.org/pkg/encoding/json/#NewEncoder
+
+}
+
+//fetchHTML fetches `pageURL` and returns the body stream or an error.
+//Errors are returned if the response status code is an error (&gt;=400),
+//or if the content type indicates the URL is not an HTML page.
+func fetchHTML(pageURL string) (io.ReadCloser, error) <span class="cov8" title="1">{
+
+        resp, err := http.Get(pageURL)
+        if err == nil </span><span class="cov8" title="1">{
+                ctype := resp.Header.Get("Content-Type")
+                if resp.StatusCode &gt;= 400 </span><span class="cov8" title="1">{
+                        return nil, errors.New("404 not found")
+                }</span> else<span class="cov8" title="1"> if !strings.HasPrefix(ctype, "text/html") </span><span class="cov8" title="1">{
+                        return nil, errors.New("Content-Type is not HTML")
+                }</span>
+        } else<span class="cov0" title="0"> {
+                return nil, errors.New("404 not found")
+        }</span>
+        <span class="cov8" title="1">return resp.Body, nil</span>
+
+}
+
+//extractSummary tokenizes the `htmlStream` and populates a PageSummary
+//struct with the page's summary meta-data.
+func extractSummary(pageURL string, htmlStream io.ReadCloser) (*PageSummary, error) <span class="cov8" title="1">{
+        /*TODO: tokenize the `htmlStream` and extract the page summary meta-data
+        according to the assignment description.
+        To test your implementation of this function, run the TestExtractSummary
+        test in summary_test.go. You can do that directly in Visual Studio Code,
+        or at the command line by running:
+                go test -run TestExtractSummary
+        Helpful Links:
+        https://drstearns.github.io/tutorials/tokenizing/
+        http://ogp.me/
+        https://developers.facebook.com/docs/reference/opengraph/
+        https://golang.org/pkg/net/url/#URL.ResolveReference
+        */
+
+        tokenizer := html.NewTokenizer(htmlStream)
+        summary := new(PageSummary)
+
+        var dict map[string]*PreviewImage
+        dict = make(map[string]*PreviewImage)
+        newIcon := new(PreviewImage)
+        var arr []string
+
+        for </span><span class="cov8" title="1">{
+                tokenType := tokenizer.Next()
+                if tokenType == html.ErrorToken </span><span class="cov8" title="1">{
+                        err := tokenizer.Err()
+                        if err == io.EOF </span><span class="cov8" title="1">{
+                                break</span>
+                        }
+                }
+                <span class="cov8" title="1">if tokenType == html.StartTagToken || tokenType == html.SelfClosingTagToken </span><span class="cov8" title="1">{
+                        token := tokenizer.Token()
+                        if token.Data == "title" &amp;&amp; len(summary.Title) == 0 </span><span class="cov8" title="1">{
+                                tokenType = tokenizer.Next()
+                                if tokenType == html.TextToken </span><span class="cov8" title="1">{
+                                        summary.Title = tokenizer.Token().Data
+                                }</span>
+                        }
+                        <span class="cov8" title="1">if token.Data == "meta" </span><span class="cov8" title="1">{
+                                var property string
+                                var content string
+                                var name string
+                                for _, class := range token.Attr </span><span class="cov8" title="1">{
+                                        if class.Key == "property" </span><span class="cov8" title="1">{
+                                                property = class.Val
+                                        }</span> else<span class="cov8" title="1"> if class.Key == "content" </span><span class="cov8" title="1">{
+                                                content = class.Val
+                                        }</span> else<span class="cov8" title="1"> if class.Key == "name" </span><span class="cov8" title="1">{
+                                                name = class.Val
+                                        }</span>
+                                }
+                                <span class="cov8" title="1">if strings.Contains(property, "og:image") </span><span class="cov8" title="1">{
+                                        if property == "og:image" </span><span class="cov8" title="1">{
+                                                image := new(PreviewImage)
+                                                dict[content] = image
+                                                dict[content].URL = content
+                                                if !strings.Contains(dict[content].URL, "http") </span><span class="cov8" title="1">{
+                                                        dict[content].URL = handleAbsoluteURL(dict[content].URL, pageURL)
+                                                }</span>
+                                                <span class="cov8" title="1">arr = append(arr, content)</span>
+                                        } else<span class="cov8" title="1"> if property == "og:image:secure_url" </span><span class="cov8" title="1">{
+                                                dict[arr[len(arr)-1]].SecureURL = content
+                                        }</span> else<span class="cov8" title="1"> if property == "og:image:type" </span><span class="cov8" title="1">{
+                                                dict[arr[len(arr)-1]].Type = content
+                                        }</span> else<span class="cov8" title="1"> if property == "og:image:width" </span><span class="cov8" title="1">{
+                                                widthInt, err := strconv.Atoi(content)
+                                                if err == nil </span><span class="cov8" title="1">{
+                                                        dict[arr[len(arr)-1]].Width = widthInt
+                                                }</span>
+                                        } else<span class="cov8" title="1"> if property == "og:image:height" </span><span class="cov8" title="1">{
+                                                heightInt, err := strconv.Atoi(content)
+                                                if err == nil </span><span class="cov8" title="1">{
+                                                        dict[arr[len(arr)-1]].Height = heightInt
+                                                }</span>
+                                        } else<span class="cov8" title="1"> if property == "og:image:alt" </span><span class="cov8" title="1">{
+                                                dict[arr[len(arr)-1]].Alt = content
+                                        }</span>
+                                } else<span class="cov8" title="1"> if property == "og:type" </span><span class="cov8" title="1">{
+                                        summary.Type = content
+                                }</span> else<span class="cov8" title="1"> if property == "og:url" </span><span class="cov8" title="1">{
+                                        summary.URL = content
+                                }</span> else<span class="cov8" title="1"> if property == "og:title" </span><span class="cov8" title="1">{
+                                        summary.Title = content
+                                }</span> else<span class="cov8" title="1"> if property == "og:site_name" </span><span class="cov8" title="1">{
+                                        summary.SiteName = content
+                                }</span> else<span class="cov8" title="1"> if property == "og:description" </span><span class="cov8" title="1">{
+                                        summary.Description = content
+                                }</span> else<span class="cov8" title="1"> if name == "author" </span><span class="cov8" title="1">{
+                                        summary.Author = content
+                                }</span> else<span class="cov8" title="1"> if name == "keywords" </span><span class="cov8" title="1">{
+                                        if strings.Contains(content, " ") </span><span class="cov8" title="1">{
+                                                summary.Keywords = strings.Split(content, ", ")
+                                        }</span> else<span class="cov8" title="1"> {
+                                                summary.Keywords = strings.Split(content, ",")
+                                        }</span>
+                                } else<span class="cov8" title="1"> if name == "description" &amp;&amp; len(summary.Description) == 0 </span><span class="cov8" title="1">{
+                                        summary.Description = content
+                                }</span>
+                        }
+
+                        <span class="cov8" title="1">if "link" == token.Data </span><span class="cov8" title="1">{
+                                var rel string
+                                var icon string
+                                for _, class := range token.Attr </span><span class="cov8" title="1">{
+                                        if class.Key == "rel" </span><span class="cov8" title="1">{
+                                                rel = class.Key
+                                                icon = class.Val
+                                        }</span>
+                                }
+                                <span class="cov8" title="1">for _, attribute := range token.Attr </span><span class="cov8" title="1">{
+                                        if rel == "rel" &amp;&amp; icon == "icon" </span><span class="cov8" title="1">{
+                                                if attribute.Key == "href" </span><span class="cov8" title="1">{
+                                                        if !strings.Contains(attribute.Val, "http") </span><span class="cov8" title="1">{
+                                                                newIcon.URL = handleAbsoluteURL(attribute.Val, pageURL)
+                                                        }</span> else<span class="cov8" title="1"> {
+                                                                newIcon.URL = attribute.Val
+                                                        }</span>
+                                                }
+                                                <span class="cov8" title="1">if attribute.Key == "sizes" &amp;&amp; attribute.Val != "any" </span><span class="cov8" title="1">{
+                                                        sizes := strings.Split(attribute.Val, "x")
+                                                        if len(sizes) &gt; 0 </span><span class="cov8" title="1">{
+                                                                height, err := strconv.Atoi(sizes[0])
+                                                                width, err := strconv.Atoi(sizes[1])
+                                                                if err != nil </span><span class="cov0" title="0">{
+                                                                        return nil, err
+                                                                }</span>
+                                                                <span class="cov8" title="1">newIcon.Height = height
+                                                                newIcon.Width = width</span>
+                                                        }
+                                                }
+                                                <span class="cov8" title="1">if attribute.Key == "type" </span><span class="cov8" title="1">{
+                                                        newIcon.Type = attribute.Val
+                                                }</span>
+                                                <span class="cov8" title="1">summary.Icon = newIcon</span>
+                                        }
+                                }
+                        }
+                }
+        }
+        <span class="cov8" title="1">for _, link := range arr </span><span class="cov8" title="1">{
+                summary.Images = append(summary.Images, dict[link])
+        }</span>
+        <span class="cov8" title="1">return summary, nil</span>
+}
+
+func handleAbsoluteURL(PageURL string, resourceURL string) string <span class="cov8" title="1">{
+        URL, err := url.Parse(PageURL)
+        if err == nil </span><span class="cov8" title="1">{
+                base, err := url.Parse(resourceURL)
+                if err == nil </span><span class="cov8" title="1">{
+                        resolveReferenceURL := base.ResolveReference(URL)
+                        return resolveReferenceURL.String()
+                }</span>
+        }
+        <span class="cov0" title="0">return ""</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

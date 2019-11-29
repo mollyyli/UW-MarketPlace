@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <script src="./index.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <!-- USER SIGN UP -->
+    <form>
+        <div class="container">
+          <h1>Sign Up</h1>
+      
+          <label for="email"><b>Email</b></label>
+          <input id="email-input" type="text" placeholder="Enter Email" name="email" required>
+          <br>
+      
+          <label for="psw"><b>Password</b></label>
+          <input id="password-input" type="password" placeholder="Enter Password" name="psw" required>
+          <br>
+
+          <label for="psw-repeat"><b>Repeat Password</b></label>
+          <input id="passwordconf-input" type="password" placeholder="Repeat Password" name="psw-repeat" required>
+          <br>
+
+          <label for="psw-repeat"><b>User Name</b></label>
+          <input id="username-input" type="text" placeholder="User Name" name="psw-repeat" required>
+          <br>
+
+          <label for="psw-repeat"><b>First Name</b></label>
+          <input id="firstname-input" type="text" placeholder="First Name" name="psw-repeat" required>
+          <br>
+
+          <label for="psw-repeat"><b>Last Name</b></label>
+          <input id="lsatname-input" type="text" placeholder="Last Name" name="psw-repeat" required>
+          
+          <div class="clearfix">
+            <button style="font-size:1em" type="submit" class="signupbtn" onclick="addSession()">Sign Up</button>
+          </div>
+        </div >
+      </form>
+      <!-- SUMMARY -->
+      <h1 style="margin-top:1em;">Enter URL to summarize HTML</h1>
+    <input class="site-input" type="text" name="website">
+    <button style="font-size:1em" class="submit-button" type="button" onclick="getData()">Button</button>
+    <ul class="data"></ul>
+  </form>
+  <div id="messages">
+  </div>
+</body>
+</html>

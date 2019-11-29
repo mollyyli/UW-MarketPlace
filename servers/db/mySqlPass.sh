@@ -1,0 +1,1 @@
+export MYSQL_ROOT_PASSWORD="vFdfokNpT7lns54Y46NpBWRT"
