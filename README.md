@@ -33,6 +33,7 @@ Listing : {
 	Price: string
 	Location: string
 	Contact: string
+	Creator: string
 }
 
 User : {
