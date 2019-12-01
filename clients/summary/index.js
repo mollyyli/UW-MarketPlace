@@ -6,7 +6,7 @@ addSession = async () => {
   const firstName = document.querySelector("#firstname-input").value;
   const lastName = document.querySelector("#lastname-input").value;
 
-  await fetch(`https://api.mollyxli.me/v1/users`, {
+  await fetch(`https://api.briando.me/v1/users`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -21,7 +21,7 @@ addSession = async () => {
     }
   });
 
-  const response = await fetch(`https://api.mollyxli.me/v1/sessions`, {
+  const response = await fetch(`https://api.briando.me/v1/sessions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -38,7 +38,7 @@ addSession = async () => {
 
 
 const token = addSession()
-let socket = new WebSocket(`https://api.mollyxli.me/ws?auth=${token}`);
+let socket = new WebSocket(`https://api.briando.me/ws?auth=${token}`);
 socket.onopen = () => {
   console.log("Websocket connection open")
 }
@@ -54,7 +54,7 @@ async function getData() {
   url = document.querySelector(".site-input").value;
   // Default options are marked with *
   const response = await fetch(
-    `https://api.mollyxli.me/v1/summary?url=${url}`
+    `https://api.briando.me/v1/summary?url=${url}`
   )
   if (response.status == 200) {
     const data = await response.json();

@@ -7,7 +7,7 @@ const morgan = require("morgan");
 const mongo = require("mongodb");
 const ObjectId = require("mongodb").ObjectId;
 var MongoClient = require("mongodb").MongoClient;
-var url = "mongodb://localhost:27017/";
+var url = "mongodb://mongodb:27017/";
 const contentType = "Content-Type";
 const appJson = "application/json";
 const amqp = require('amqplib/callback_api')
@@ -47,6 +47,7 @@ app.use(morgan("dev"));
 
 app.route("/v1/listings")
   .get((req, res) => {
+    console.log(req.get("X-User"))
     if (!req.get("X-User") || req.get("X-User").length == 0) {
       res.status(401).send("Unauthorized");
       return;

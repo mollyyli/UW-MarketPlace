@@ -1,3 +1,3 @@
-docker build -t hsin1128/client .
-docker push hsin1128/client
-ssh ec2-user@mollyxli.me < deploy.sh
+docker build -t briando/client .
+docker push briando/client
+ssh ec2-user@briando.me < deploy.sh

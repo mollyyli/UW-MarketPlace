@@ -4,8 +4,8 @@
 FROM alpine
 RUN apk add --no-cache ca-certificates
 COPY gateway gateway
-# COPY /etc/letsencrypt/live/api.mollyxli.me/fullchain.pem fullchain.pem
-# COPY /etc/letsencrypt/live/api.mollyxli.me/privkey.pem privkey.pem
+# COPY /etc/letsencrypt/live/api.briando.me/fullchain.pem fullchain.pem
+# COPY /etc/letsencrypt/live/api.briando.me/privkey.pem privkey.pem
 # CMD echo "123"
 # COPY build.sh .
 # RUN chmod +x /build.sh

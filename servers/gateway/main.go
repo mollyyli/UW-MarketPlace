@@ -45,14 +45,14 @@ func CustomDirector(targets []*url.URL, rc *sessions.RedisStore) Director {
 		var currentSession handlers.SessionState
 		err := rc.Get(sessions.SessionID(sid), &currentSession)
 		if &currentSession.User == nil || err != nil {
-			r.Header.Del("X-User")
+			// r.Header.Del("X-User")
 		} else {
 			encodedUser, err := json.Marshal(currentSession.User)
 			if err != nil {
 				log.Println("error json marshal")
 			}
 			stringUser := string(encodedUser)
-			r.Header.Add("X-User", stringUser)
+			r.Header.Set("X-User", stringUser)
 		}
 		targ := targets[int(counter)%len(targets)]
 		atomic.AddInt32(&counter, 1)
@@ -70,14 +70,14 @@ func main() {
 	REDISADDR := os.Getenv("REDISADDR")
 	DSN := os.Getenv("DSN")
 	RABBITMQADDR := os.Getenv("RABBITMQADDR")
-	messageAddrs := strings.Split(os.Getenv("messageAddrs"), ", ")
+	listingAddrs := strings.Split(os.Getenv("listingAddrs"), ", ")
 	summaryAddrs := strings.Split(os.Getenv("summaryAddrs"), ", ")
 
-	MESSAGEADDR := make([]*url.URL, len(messageAddrs))
-	for i := range messageAddrs {
-		urlAddress, _ := url.Parse(messageAddrs[i])
+	LISTINGADDR := make([]*url.URL, len(listingAddrs))
+	for i := range LISTINGADDR {
+		urlAddress, _ := url.Parse(listingAddrs[i])
 
-		MESSAGEADDR[i] = urlAddress
+		LISTINGADDR[i] = urlAddress
 	}
 
 	SUMMARYADDR := make([]*url.URL, len(summaryAddrs))
@@ -105,7 +105,7 @@ func main() {
 		Addr: REDISADDR,
 	})
 	redisStore := sessions.NewRedisStore(red, time.Hour)
-	messageeProxy := &httputil.ReverseProxy{Director: CustomDirector(MESSAGEADDR, redisStore)}
+	listingProxy := &httputil.ReverseProxy{Director: CustomDirector(LISTINGADDR, redisStore)}
 	summaryProxy := &httputil.ReverseProxy{Director: CustomDirector(SUMMARYADDR, redisStore)}
 	db, err := sql.Open("mysql", DSN)
 	if err != nil {
@@ -120,7 +120,7 @@ func main() {
 		SockStore:    *new(handlers.SocketStore),
 	}
 
-	conn, err := amqp.Dial(RABBITMQADDR)
+	conn, err := amqp.Dial("amqp://" + RABBITMQADDR)
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -173,8 +173,8 @@ func main() {
 	mux.HandleFunc("/v1/users/", ctx.SpecificUserHandler)
 	mux.HandleFunc("/v1/sessions", ctx.SessionsHandler)
 	mux.HandleFunc("/v1/sessions/", ctx.SpecificSessionHandler)
-	mux.Handle("/v1/messages", messageeProxy)
-	mux.Handle("/v1/channels", messageeProxy)
+	mux.Handle("/v1/listings", listingProxy)
+	// mux.Handle("/v1/channels", messageeProxy)
 	mux.Handle("/v1/summary", summaryProxy)
 	mux.HandleFunc("/v1/ws", ctx.SocketHandler)
 	log.Printf("server is listening at http://%s", addr)
