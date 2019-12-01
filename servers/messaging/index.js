@@ -7,9 +7,10 @@ const morgan = require("morgan");
 const mongo = require("mongodb");
 const ObjectId = require("mongodb").ObjectId;
 var MongoClient = require("mongodb").MongoClient;
-var url = "mongodb://mongodb:27017/";
+var url = "mongodb://localhost:27017/";
 const contentType = "Content-Type";
 const appJson = "application/json";
+const amqp = require('amqplib/callback_api')
 
 MongoClient.connect(url, function (err, db) {
   if (err) throw err;
@@ -34,21 +35,21 @@ app.use(express.json());
 //add the request logging middleware
 app.use(morgan("dev"));
 
-let channel;
-amqp.connect("amqp://" + process.env.RABBITMQADDR + ":5672/", (err, conn) => {
-  conn.createChannel(function (err, ch) {
-    var q = process.env.RABBITMQADDR;
+// let channel;
+// amqp.connect("amqp://" + process.env.RABBITMQADDR + ":5672/", (err, conn) => {
+//   conn.createChannel(function (err, ch) {
+//     var q = process.env.RABBITMQADDR;
 
-    ch.assertQueue(q, { durable: false });
-    channel = ch;
-  });
-});
+//     ch.assertQueue(q, { durable: false });
+//     channel = ch;
+//   });
+// });
 
-app
-  .route("/v1/listings")
+app.route("/v1/listings")
   .get((req, res) => {
     if (!req.get("X-User") || req.get("X-User").length == 0) {
       res.status(401).send("Unauthorized");
+      return;
     }
     MongoClient.connect(url, (err, db) => {
       if (err) throw err;
@@ -65,17 +66,18 @@ app
         });
     });
   })
-  .route("/v1/listings/:id")
+app.route("/v1/listings/:id")
   .get((req, res) => {
     if (!req.get("X-User") || req.get("X-User").length == 0) {
       res.status(401).send("Unauthorized");
+      return;
     }
     MongoClient.connect(url, (err, db) => {
       if (err) throw err;
       let dbo = db.db("mydb");
       dbo
         .collection("listings")
-        .find({ _id: req.params.id })
+        .find({ creator: req.params.id })
         .toArray(function (err, result) {
           if (err) throw err;
           res.status(200);
