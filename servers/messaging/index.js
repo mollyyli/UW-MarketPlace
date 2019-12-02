@@ -47,11 +47,11 @@ app.use(morgan("dev"));
 
 app.route("/v1/listings")
   .get((req, res) => {
-    console.log(req.get("X-User"))
-    if (!req.get("X-User") || req.get("X-User").length == 0) {
-      res.status(401).send("Unauthorized");
-      return;
-    }
+    // console.log(req.get("X-User"))
+    // if (!req.get("X-User") || req.get("X-User").length == 0) {
+    //   res.status(401).send("Unauthorized");
+    //   return;
+    // }
     MongoClient.connect(url, (err, db) => {
       if (err) throw err;
       let dbo = db.db("mydb");
