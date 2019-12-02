@@ -13,7 +13,7 @@ function App() {
     <Router>
       <NavBar />
       <Route path="/listings" component={Listings} />
-      <Route path="/listings/:listingID" component={ListingInfo} />
+      <Route path="/listing/:listingID" component={ListingInfo} />
     </Router>
     // </div>
   );

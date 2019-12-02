@@ -20,3 +20,8 @@
 .App-link {
   color: #09d3ac;
 }
+
+.loading-spinner {
+  margin-top: 30vh;
+  text-align: center;
+}

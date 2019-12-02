@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {
-  Card, Container, Row, Col, CardText, CardBody,
-  CardTitle, CardSubtitle, Button, Spinner
+  Card, Container, Row, Button, Spinner
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import "./ListingInfo.css";
@@ -14,6 +13,9 @@ class ListingInfo extends Component {
       listing: {},
       loading: false
     }
+  }
+  goBack = () => {
+    this.props.history.goBack();
   }
   componentDidMount = async () => {
     await this.getListingInfo();
@@ -28,13 +30,27 @@ class ListingInfo extends Component {
     });
     const listing = await response.json();
     console.log(listing)
-    this.setState({ listings: listing, loading: false });
+    this.setState({ listing: listing, loading: false });
   }
   render() {
     return (
       <div className="ListingInfo">
         <Container>
-        
+          {this.state.loading ?
+            <div className="loading-spinner">
+              <Spinner style={{ width: '8rem', height: '8rem' }} color="primary" />
+            </div> :
+            <div>
+              <h1>{this.state.listing.title}</h1>
+              <div>{this.state.listing.description}</div>
+              <div>{this.state.listing.contact}</div>
+              <div>{this.state.listing.location}</div>
+              <div>${this.state.listing.price}</div>
+              <Button onClick={this.goBack}>
+                Back
+              </Button>
+            </div>
+          }
         </Container>
       </div>
     );

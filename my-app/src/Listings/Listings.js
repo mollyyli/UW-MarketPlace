@@ -37,7 +37,7 @@ class Listings extends Component {
           {this.state.listings.length ?
             <Row>
               {this.state.listings.map(listing => {
-              const listingRoute = `/listings/${listing._id}`;
+              const listingRoute = `/listing/${listing._id}`;
                 return (
                   <Col xs="12" sm="6" md="4" key={listing._id}>
                     <Card className="listing-card">
