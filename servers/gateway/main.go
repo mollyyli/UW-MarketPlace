@@ -120,7 +120,7 @@ func main() {
 		SockStore:    *new(handlers.SocketStore),
 	}
 
-	conn, err := amqp.Dial("amqp://" + RABBITMQADDR)
+	conn, err := amqp.Dial("amqp://" + RABBITMQADDR + ":5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -174,6 +174,7 @@ func main() {
 	mux.HandleFunc("/v1/sessions", ctx.SessionsHandler)
 	mux.HandleFunc("/v1/sessions/", ctx.SpecificSessionHandler)
 	mux.Handle("/v1/listings", listingProxy)
+	mux.Handle("/v1/listings/", listingProxy)
 	// mux.Handle("/v1/channels", messageeProxy)
 	mux.Handle("/v1/summary", summaryProxy)
 	mux.HandleFunc("/v1/ws", ctx.SocketHandler)

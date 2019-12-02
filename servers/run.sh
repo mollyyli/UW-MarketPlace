@@ -18,30 +18,38 @@ docker run -d \
 -e MYSQL_DATABASE=demo \
 briando/database
 
-docker rm -f gateway
-docker pull briando/gateway
-docker run -d \
--e SESSIONKEY=$SESSIONKEY \
--e TLSCERT="/etc/letsencrypt/live/api.briando.me/fullchain.pem" \
--e TLSKEY="/etc/letsencrypt/live/api.briando.me/privkey.pem" \
--e DSN=$DSN \
--e RABBITMQADDR="some-rabbit" \
--p 443:443 \
--e listingAddrs="http://nodecontainer:5000, http://nodecontainer1:5000" \
--e summaryAddrs="http://summarycontainer:7000, http://summarycontainer1:7000" \
---name gateway \
---network=nodeapp \
--v /etc/letsencrypt:/etc/letsencrypt:ro briando/gateway 
+# docker rm -f gateway
+# docker pull briando/gateway
+# docker run -d \
+# -e SESSIONKEY=$SESSIONKEY \
+# -e TLSCERT="/etc/letsencrypt/live/api.briando.me/fullchain.pem" \
+# -e TLSKEY="/etc/letsencrypt/live/api.briando.me/privkey.pem" \
+# -e DSN=$DSN \
+# -e RABBITMQADDR="some-rabbit" \
+# -p 443:443 \
+# -e listingAddrs="http://nodecontainer:5000, http://nodecontainer1:5000" \
+# -e summaryAddrs="http://summarycontainer:7000, http://summarycontainer1:7000" \
+# --name gateway \
+# --network=nodeapp \
+# -v /etc/letsencrypt:/etc/letsencrypt:ro briando/gateway 
 
 docker rm -f some-rabbit
 docker pull rabbitmq:3
-docker run -d --name some-rabbit -p 5672:5672 --network=nodeapp rabbitmq:3
+docker run -d --name some-rabbit -p 5672:5672 -p 15672:15672 --network=nodeapp rabbitmq:3
 
 docker rm -f some-redis
 docker run --name some-redis -p 6379:6379 -d redis
 
 docker rm -f mongodb
 docker run -d -p 27017:27017 --name mongodb --network=nodeapp mongo
+
+# dummy data
+# docker exec -it mongodb bash
+# mongo
+# use mydb
+# db.listings.insert({title: "dummy title", description: "dummy desc", condition: "dummy condition", price: "5", location: "Seattle", contact: "dummy contact", creator: "1"})
+# exit
+# exit
 
 sleep 25
 
@@ -61,6 +69,21 @@ docker run -d --network=nodeapp -e ADDR=":7000" --name summarycontainer briando/
 docker rm -f summarycontainer1
 docker pull briando/summarycontainer
 docker run -d --network=nodeapp -e ADDR=":7000" --name summarycontainer1 briando/summarycontainer
+
+docker rm -f gateway
+docker pull briando/gateway
+docker run -d \
+-e SESSIONKEY=$SESSIONKEY \
+-e TLSCERT="/etc/letsencrypt/live/api.briando.me/fullchain.pem" \
+-e TLSKEY="/etc/letsencrypt/live/api.briando.me/privkey.pem" \
+-e DSN=$DSN \
+-e RABBITMQADDR="some-rabbit" \
+-p 443:443 \
+-e listingAddrs="http://nodecontainer:5000, http://nodecontainer1:5000" \
+-e summaryAddrs="http://summarycontainer:7000, http://summarycontainer1:7000" \
+--name gateway \
+--network=nodeapp \
+-v /etc/letsencrypt:/etc/letsencrypt:ro briando/gateway 
 
 docker ps -a
 

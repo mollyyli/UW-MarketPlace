@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Link, NavLink, Switch } from "react-rou
 
 import './App.css';
 import Listings from './Listings/Listings';
+import ListingInfo from './ListingInfo/ListingInfo';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
     <Router>
       <NavBar />
       <Route path="/listings" component={Listings} />
+      <Route path="/listings/:listingID" component={ListingInfo} />
     </Router>
     // </div>
   );

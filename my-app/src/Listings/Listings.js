@@ -3,6 +3,7 @@ import {
   Card, Container, Row, Col, CardText, CardBody,
   CardTitle, CardSubtitle, Button, Spinner
 } from 'reactstrap';
+import { Link } from 'react-router-dom';
 import "./Listings.css";
 import '../App.css';
 
@@ -36,6 +37,7 @@ class Listings extends Component {
           {this.state.listings.length ?
             <Row>
               {this.state.listings.map(listing => {
+              const listingRoute = `/listings/${listing._id}`;
                 return (
                   <Col xs="12" sm="6" md="4" key={listing._id}>
                     <Card className="listing-card">
@@ -43,7 +45,9 @@ class Listings extends Component {
                         <CardTitle>{listing.title}</CardTitle>
                         <CardSubtitle>${listing.price}</CardSubtitle>
                         <CardText>{listing.description}</CardText>
-                        <Button>More Info</Button>
+                        <Link to={listingRoute}>
+                          <Button>More Info</Button>
+                        </Link>
                       </CardBody>
                     </Card>
                   </Col>
