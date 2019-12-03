@@ -59,6 +59,7 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// SpecificUserHandler : givn specific ID
 func (ctx *Context) SpecificUserHandler(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/v1/users/")
 

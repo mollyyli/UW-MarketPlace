@@ -1,0 +1,31 @@
+.signin {
+    margin-top: 2rem;
+  }
+  
+  .listing-card {
+    margin-bottom: 1rem;
+  }
+  
+  .loading-spinner {
+    margin-top: 30vh;
+    text-align: center;
+  }
+
+  .email {
+    display: block;
+    max-width: 300px;
+    margin: auto;
+  }
+
+  .password {
+    display: block;
+    max-width: 300px;
+    margin: auto;
+  }
+
+  .button {
+    display: block;
+    background-color: #282c34;
+    max-width: 300px;
+    margin: auto;
+  }
