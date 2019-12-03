@@ -126,51 +126,54 @@ app.route("/v1/listings/:id")
         })
     })
   })
-  .patch((req, res) => {
-    if (!req.get("X-User") || req.get("X-User").length == 0) {
-      res.status(401).send("Unauthorized");
+app.route("/v1/listings/:id").patch((req, res) => {
+  if (!req.get("X-User") || req.get("X-User").length == 0) {
+    res.status(401).send("Unauthorized");
+    return
+  }
+  console.log(req.params)
+  if (req.params.listingID.length != 24) {
+    res.status(403).send("Invalid listing ID");
+    return
+  }
+  let listingID = new mongo.ObjectId(req.params.listingID);
+  let reqUserID = JSON.parse(req.header("X-User")).id;
+  let reqBody = req.body;
+  MongoClient.connect(url, async (err, db) => {
+    if (err) throw err;
+    let dbo = db.db("mydb");
+    const result = await dbo.collection("listings").findOne({ _id: listingID });
+    console.log(reqUserID, result.creator)
+    if (!result || reqUserID != result.creator) {
+      res.status(403).send("Unauthorized user or channel does not exist");
+    } else {
+      dbo
+        .collection("listings")
+        .findOneAndUpdate(
+          { _id: listingID },
+          { $set: { title: reqBody.title, description: reqBody.description, condition: reqBody.condition, location: reqBody.location, price: reqBody.price } },
+          { returnOriginal: false },
+          (err, document) => {
+            if (err) throw err;
+            let result = document.value;
+            let channelMembers = [];
+            result.members && result.private && result.members.forEach(member => {
+              channelMembers.push(member.id);
+            });
+            const event = {
+              type: "channel-update",
+              channel: result,
+              userIDs: channelMembers
+            };
+            // channel.sendToQueue(process.env.RABBITMQADDR, new Buffer(JSON.stringify(event)), { persistent: true });
+            res.set("Content-Type", "application/json");
+            res.status(200).send(`Channel with id "${listingID}" was updated to "${JSON.stringify(result)}"`);
+            db.close();
+          }
+        );
     }
-    if (req.params.listingID.length != 24) {
-      res.status(403).send("Invalid channel ID");
-    }
-    let listingID = new mongo.ObjectId(req.params.listingID);
-    let reqUserID = JSON.parse(req.header("X-User")).id;
-    let reqBody = req.body;
-    MongoClient.connect(url, async (err, db) => {
-      if (err) throw err;
-      let dbo = db.db("mydb");
-      const result = await dbo.collection("listings").findOne({ _id: listingID });
-      console.log(reqUserID, result.creator)
-      if (!result || reqUserID != result.creator) {
-        res.status(403).send("Unauthorized user or channel does not exist");
-      } else {
-        dbo
-          .collection("listings")
-          .findOneAndUpdate(
-            { _id: listingID },
-            { $set: { title: reqBody.title, description: reqBody.description, condition: reqBody.condition, location: reqBody.location, price: reqBody.price } },
-            { returnOriginal: false },
-            (err, document) => {
-              if (err) throw err;
-              let result = document.value;
-              let channelMembers = [];
-              result.members && result.private && result.members.forEach(member => {
-                channelMembers.push(member.id);
-              });
-              const event = {
-                type: "channel-update",
-                channel: result,
-                userIDs: channelMembers
-              };
-              // channel.sendToQueue(process.env.RABBITMQADDR, new Buffer(JSON.stringify(event)), { persistent: true });
-              res.set("Content-Type", "application/json");
-              res.status(200).send(`Channel with id "${listingID}" was updated to "${JSON.stringify(result)}"`);
-              db.close();
-            }
-          );
-      }
-    });
-  })
+  });
+})
 app.route("/v1/listings/creator/:id")
   .get((req, res) => {
     MongoClient.connect(url, (err, db) => {
@@ -178,7 +181,7 @@ app.route("/v1/listings/creator/:id")
       let dbo = db.db("mydb");
       dbo
         .collection("listings")
-        .find({creator: Number(req.params.id)})
+        .find({ creator: Number(req.params.id) })
         .toArray(function (err, result) {
           if (err) throw err;
           res.status(200);
