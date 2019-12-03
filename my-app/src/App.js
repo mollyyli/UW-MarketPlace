@@ -7,6 +7,7 @@ import './App.css';
 import Listings from './Listings/Listings';
 import Signin from './signin/Signin';
 import ListingInfo from './ListingInfo/ListingInfo';
+import SignUp from './SignUp/SignUp';
 import AddListing from './AddListing/AddListing';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Route path="/sign-in" component={Signin} />
 
       <Route path="/listing/:listingID" component={ListingInfo} />
+      <Route path="/sign-up" component={SignUp} />
       <Route path="/add" component={AddListing} />
     </Router>
     // </div>
