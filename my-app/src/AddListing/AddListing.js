@@ -13,9 +13,15 @@ class AddListing extends Component {
       title: "",
       description: "",
       condition: "",
+      location: "",
       price: "",
       contact: "",
       validated: true
+    }
+  }
+  componentDidMount = () => {
+    if (!this.props.sid) {
+      this.props.history.push("/sign-in")
     }
   }
   handleInputChange = ({ target: { name, value } }) => {
@@ -28,14 +34,16 @@ class AddListing extends Component {
       const response = await fetch('https://api.briando.me/v1/listings', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': this.props.sid
         },
         body: JSON.stringify({
           "title": this.state.title,
           "description": this.state.description,
           "condition": this.state.condition,
           "price": this.state.price,
-          "contact": this.state.contact
+          "contact": this.state.contact,
+          "location": this.state.location
         })
       })
       const listing = await (response.json());

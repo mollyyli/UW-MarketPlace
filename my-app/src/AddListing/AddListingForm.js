@@ -7,6 +7,7 @@ const AddNameForm = ({
   condition,
   price,
   contact,
+  location,
   onHandleInputChange,
   onHandleSubmit
 }) => (
@@ -30,6 +31,10 @@ const AddNameForm = ({
       <FormGroup>
         <Label for="contact">Contact</Label>
         <Input name="contact" value={contact} onChange={onHandleInputChange} />
+      </FormGroup>
+      <FormGroup>
+        <Label for="location">Location</Label>
+        <Input name="location" value={location} onChange={onHandleInputChange} />
       </FormGroup>
       <Button type="submit">Add Listing</Button>
     </Form>

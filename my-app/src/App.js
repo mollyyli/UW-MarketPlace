@@ -9,31 +9,34 @@ import Signin from './signin/Signin';
 import ListingInfo from './ListingInfo/ListingInfo';
 import SignUp from './SignUp/SignUp';
 import AddListing from './AddListing/AddListing';
+import MyListings from './MyListings/MyListings'
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      sid: ""
+      sid: localStorage.getItem('sid') ? localStorage.getItem('sid') : ""
     }
   }
-  handleStateChange = (newSid) => {
-    // let sid = this.state.sid;
-    this.setState({ sid: newSid });
-    console.log(this.state.sid);
+
+  handleStateChange = async (newSid) => {
+    localStorage.setItem('sid', newSid);
+    this.setState({ sid: newSid })
+    console.log("handle change app state", this.state.sid);
   }
   render() {
-    console.log(this.state.sid);
+    console.log("app state", this.state);
     return (
       // <div className="App">
       <Router>
-        <NavBar />
+        <NavBar sid={this.state.sid} handleStateChange={this.handleStateChange} />
         <Route path="/listings" component={Listings} />
         <Route path="/sign-in" render={(props) => <Signin {...props} handleStateChange={this.handleStateChange} />} />
 
         <Route path="/listing/:listingID" component={ListingInfo} />
         <Route path="/sign-up" component={SignUp} />
-        <Route path="/add" component={AddListing} />
+        <Route path="/add" render={(props) => <AddListing {...props} sid={this.state.sid} />} />
+        <Route path="/my-listings" render={(props) => <MyListings {...props} sid={this.state.sid} />} />
       </Router>
       // </div>
     );
