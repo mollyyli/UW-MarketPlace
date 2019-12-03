@@ -11,6 +11,7 @@ import SignUp from './SignUp/SignUp';
 import AddListing from './AddListing/AddListing';
 import MyListings from './MyListings/MyListings'
 import EditListings from './EditListings/EditListings'
+import Splash from './Splash/Splash'
 
 class App extends React.Component {
   constructor(props) {
@@ -40,9 +41,9 @@ class App extends React.Component {
   render() {
     console.log("app state", this.state);
     return (
-      // <div className="App">
       <Router>
         <NavBar sid={this.state.sid} handleStateChange={this.handleStateChange} />
+        <Route path="/home" component={Splash} />
         <Route path="/listings" component={Listings} />
         <Route path="/sign-in" render={(props) => <Signin {...props} handleStateChange={this.handleStateChange} />} />
 
