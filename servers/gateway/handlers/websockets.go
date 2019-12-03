@@ -3,6 +3,7 @@ package handlers
 import (
 	"UW-Marketplace/servers/gateway/sessions"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 
@@ -70,7 +71,13 @@ func (s *SocketStore) InsertConnection(userID int64, conn *websocket.Conn) {
 	// connId := len(s.Connections)
 	// insert socket connection
 	// s.Connections = append(s.Connections, conn)
-	s.Connections[userID] = conn
+	if s.Connections == nil {
+		connMap := make(map[int64]*websocket.Conn)
+		connMap[userID] = conn
+		s.Connections = connMap
+	} else {
+		s.Connections[userID] = conn
+	}
 	s.lock.Unlock()
 	// return connId
 }
@@ -84,6 +91,7 @@ func (s *SocketStore) RemoveConnection(connId int64) {
 }
 
 func (s *SocketStore) WriteToAllConnections(messageType int, data []byte) error {
+	log.Println("Data", data)
 	var writeError error
 
 	for _, conn := range s.Connections {
@@ -97,17 +105,22 @@ func (s *SocketStore) WriteToAllConnections(messageType int, data []byte) error 
 }
 
 func (ctx *Context) SocketHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("here")
 	var sessionState SessionState
 	sessionSid, err := sessions.GetState(r, ctx.SigningKey, ctx.SessionStore, &sessionState)
+	log.Println("sessionsid", sessionSid)
+	log.Println("sessionstate", sessionState)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		http.Error(w, "Websocket connection refused", http.StatusUnauthorized)
+		return
 	} else {
 		_, err := sessions.ValidateID(sessionSid.String(), ctx.SigningKey)
 		if err == nil {
 			conn, err := upgrader.Upgrade(w, r, nil)
 			if err != nil {
 				http.Error(w, "Failed upgrade", http.StatusBadRequest)
+				return
 			}
 			ctx.SockStore.InsertConnection(sessionState.User.ID, conn)
 			go (func(conn *websocket.Conn) {
@@ -115,7 +128,7 @@ func (ctx *Context) SocketHandler(w http.ResponseWriter, r *http.Request) {
 				defer ctx.SockStore.RemoveConnection(sessionState.User.ID)
 				for {
 					messageType, p, err := conn.ReadMessage()
-					// 	if err != nil {
+					log.Println("message error", err)					// 	if err != nil {
 					// 		log.Println("Error reading message")
 					// 		break
 					// 	} else if messageType == 8 {
@@ -140,4 +153,5 @@ func (ctx *Context) SocketHandler(w http.ResponseWriter, r *http.Request) {
 			})(conn)
 		}
 	}
+}
 }

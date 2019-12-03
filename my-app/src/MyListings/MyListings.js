@@ -4,6 +4,7 @@ import {
   CardTitle, CardSubtitle, Button, Spinner
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { array } from 'prop-types';
 
 class MyListings extends Component {
   constructor(props) {
@@ -15,7 +16,7 @@ class MyListings extends Component {
   }
 
   componentDidMount = async () => {
-    this.setState({loading: true})
+    this.setState({ loading: true })
     const userResponse = await fetch("https://api.briando.me/v1/users/me", {
       method: 'GET',
       headers: {
@@ -30,6 +31,27 @@ class MyListings extends Component {
     const listings = await listingsResponse.json();
     this.setState({ listings: listings, loading: false })
     console.log(listings);
+  }
+
+  delete = async (listingID) => {
+    this.setState({ loading: true })
+    console.log(listingID)
+    const response = await fetch(`https://api.briando.me/v1/listings/${listingID}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': this.props.sid
+      }
+    });
+    const newListings = this.state.listings;
+    for (let i = 0; i < newListings.length; i++) {
+      if (newListings[i]._id === listingID) {
+        newListings.splice(i, 1)
+        break;
+      }
+    }
+    this.setState({ listings: newListings })
+    console.log("res", response)
+    this.setState({ loading: false })
   }
 
   render() {
@@ -54,6 +76,7 @@ class MyListings extends Component {
                         <Link to={listingRoute}>
                           <Button>Edit</Button>
                         </Link>
+                        <Button onClick={() => this.delete(listing._id)}>Delete</Button>
                       </CardBody>
                     </Card>
                   </Col>
