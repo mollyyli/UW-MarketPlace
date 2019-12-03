@@ -35,15 +35,15 @@ app.use(express.json());
 //add the request logging middleware
 app.use(morgan("dev"));
 
-// let channel;
-// amqp.connect("amqp://" + process.env.RABBITMQADDR + ":5672/", (err, conn) => {
-//   conn.createChannel(function (err, ch) {
-//     var q = process.env.RABBITMQADDR;
+let channel;
+amqp.connect("amqp://" + process.env.RABBITMQADDR + ":5672/", (err, conn) => {
+  conn.createChannel(function (err, ch) {
+    var q = process.env.RABBITMQADDR;
 
-//     ch.assertQueue(q, { durable: false });
-//     channel = ch;
-//   });
-// });
+    ch.assertQueue(q, { durable: false });
+    channel = ch;
+  });
+});
 
 app.route("/v1/listings")
   .get((req, res) => {
@@ -88,6 +88,11 @@ app.route("/v1/listings").post((req, res) => {
     dbo.collection("listings").insertOne(listingObj, async function (err, result) {
       if (err) throw err;
       db.close();
+      const event = {
+        type: "listing-new",
+        message: msgObj
+      };
+      channel.sendToQueue(process.env.RABBITMQADDR, new Buffer(JSON.stringify(event)), { persistent: true });
       res.status(201);
       res.set("Content-Type", "application/json");
       console.log("listingObj", listingObj)

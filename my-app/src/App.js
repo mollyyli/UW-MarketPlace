@@ -19,6 +19,18 @@ class App extends React.Component {
       sid: localStorage.getItem('sid') ? localStorage.getItem('sid') : ""
     }
   }
+  componentDidMount = async () => {
+    let socket = new WebSocket(`wss://api.briando.me/v1/ws/auth?=${this.state.sid}`);
+    socket.onopen = () => {
+      console.log("Websocket connection open")
+    }
+    socket.onclose = () => {
+      console.log("Websocket connection closed")
+    }
+    socket.onmessage = (event) => {
+      console.log(event.data)
+    }
+  }
 
   handleStateChange = async (newSid) => {
     localStorage.setItem('sid', newSid);

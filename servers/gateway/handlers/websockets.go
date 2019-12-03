@@ -3,6 +3,7 @@ package handlers
 import (
 	"UW-Marketplace/servers/gateway/sessions"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 
@@ -97,6 +98,7 @@ func (s *SocketStore) WriteToAllConnections(messageType int, data []byte) error 
 }
 
 func (ctx *Context) SocketHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("here")
 	var sessionState SessionState
 	sessionSid, err := sessions.GetState(r, ctx.SigningKey, ctx.SessionStore, &sessionState)
 	if err != nil {
