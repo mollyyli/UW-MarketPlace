@@ -30,7 +30,6 @@ class ListingInfo extends Component {
       }
     });
     const listing = await (response.json());
-    console.log(listing)
     this.setState({ listing: listing, loading: false });
   }
   render() {

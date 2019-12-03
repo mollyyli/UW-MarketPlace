@@ -47,11 +47,6 @@ amqp.connect("amqp://" + process.env.RABBITMQADDR + ":5672/", (err, conn) => {
 
 app.route("/v1/listings")
   .get((req, res) => {
-    // console.log(req.get("X-User"))
-    // if (!req.get("X-User") || req.get("X-User").length == 0) {
-    //   res.status(401).send("Unauthorized");
-    //   return;
-    // }
     MongoClient.connect(url, (err, db) => {
       if (err) throw err;
       let dbo = db.db("mydb");
@@ -68,7 +63,6 @@ app.route("/v1/listings")
     });
   })
 app.route("/v1/listings").post((req, res) => {
-  console.log("req", req.headers)
   if (!req.get("X-User") || req.get("X-User").length == 0) {
     res.status(401).send("Unauthorized");
     return;
@@ -95,8 +89,6 @@ app.route("/v1/listings").post((req, res) => {
       channel.sendToQueue(process.env.RABBITMQADDR, new Buffer(JSON.stringify(event)), { persistent: true });
       res.status(201);
       res.set("Content-Type", "application/json");
-      console.log("listingObj", listingObj)
-      // console.log("result", result)
       res.json(listingObj);
     });
   });
@@ -117,8 +109,6 @@ app.route("/v1/listings/:id")
       dbo
         .collection("listings")
         .findOne({ _id: new ObjectId(req.params.id) }, (err, result) => {
-          console.log("result", result)
-          console.log("req param id", req.params.id)
           if (err) throw err;
           if (!result) {
             res.sendStatus(404);
@@ -134,7 +124,6 @@ app.route("/v1/listings/:id")
   })
 app.route("/v1/listings/:id")
 .patch((req, res) => {
-  console.log("req", req.headers)
   if (!req.get("X-User") || req.get("X-User").length == 0) {
     res.status(401).send("Unauthorized");
     return
@@ -150,7 +139,6 @@ app.route("/v1/listings/:id")
     if (err) throw err;
     let dbo = db.db("mydb");
     const result = await dbo.collection("listings").findOne({ _id: listingID });
-    console.log(reqUserID, result.creator)
     if (!result || reqUserID != result.creator) {
       res.status(403).send("Unauthorized user or channel does not exist");
     } else {

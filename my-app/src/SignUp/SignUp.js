@@ -37,7 +37,6 @@ class SignUp extends Component {
     } else {
         this.setState({signUpAttempt: true})
     }
-    console.log(listing);
     }
   render() {
     let content, signup;
