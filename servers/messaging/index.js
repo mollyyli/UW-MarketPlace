@@ -68,11 +68,11 @@ app.route("/v1/listings")
     });
   })
 app.route("/v1/listings").post((req, res) => {
-  // if (!req.get("X-User") || req.get("X-User").length == 0) {
-  //   res.status(401).send("Unauthorized");
-  //   return;
-  // }
-  // let reqUserID = JSON.parse(req.header("X-User")).id;
+  if (!req.get("X-User") || req.get("X-User").length == 0) {
+    res.status(401).send("Unauthorized");
+    return;
+  }
+  let reqUserID = JSON.parse(req.header("X-User")).id;
   MongoClient.connect(url, function (err, db) {
     if (err) throw err;
     let dbo = db.db("mydb");
@@ -83,7 +83,7 @@ app.route("/v1/listings").post((req, res) => {
     listingObj.price = req.body.price;
     listingObj.location = req.body.location;
     listingObj.contact = req.body.contact;
-    // listingObj.creator = reqUserID;
+    listingObj.creator = reqUserID;
     dbo.collection("listings").insertOne(listingObj, async function (err, result) {
       if (err) throw err;
       db.close();

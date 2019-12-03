@@ -3,6 +3,7 @@ package sessions
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -69,6 +70,7 @@ func (rs *RedisStore) Get(sid SessionID, sessionState interface{}) error {
 	if err := json.Unmarshal([]byte(buffer), sessionState); err != nil {
 		return fmt.Errorf("error JSON unmarshal: %v", err)
 	}
+	log.Println("session state marshal", sessionState)
 	cmd := rs.Client.Expire(sid.getRedisKey(), rs.SessionDuration)
 	if cmd.Err() != nil {
 		return ErrStateNotFound

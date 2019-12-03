@@ -3,6 +3,7 @@ package sessions
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -48,6 +49,7 @@ func GetSessionID(r *http.Request, signingKey string) (SessionID, error) {
 	//and validate it. If it's valid, return the SessionID. If not
 	//return the validation error.
 	auth := r.Header.Get(headerAuthorization)
+	log.Println("auth", auth)
 	if !strings.HasPrefix(auth, schemeBearer) && len(auth) > 0 {
 		return InvalidSessionID, ErrInvalidScheme
 	}
@@ -80,10 +82,13 @@ func GetState(r *http.Request, signingKey string, store Store, sessionState inte
 	//TODO: get the SessionID from the request, and get the data
 	//associated with that SessionID from the store.
 	sessionID, err := GetSessionID(r, signingKey)
+	log.Println("sessionID", sessionID)
+	log.Println("get session id error", err)
 	if err != nil {
 		return InvalidSessionID, err
 	}
 	if err := store.Get(sessionID, sessionState); err != nil {
+		log.Println("store.get error", err)
 		return InvalidSessionID, err
 	}
 	return sessionID, nil
