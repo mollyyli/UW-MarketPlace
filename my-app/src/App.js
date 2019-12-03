@@ -21,7 +21,7 @@ class App extends React.Component {
     }
   }
   componentDidMount = async () => {
-    let socket = new WebSocket(`wss://api.briando.me/v1/ws/auth?=${this.state.sid}`);
+    let socket = new WebSocket(`wss://api.briando.me/v1/ws?auth=${this.state.sid}`);
     socket.onopen = () => {
       console.log("Websocket connection open")
     }
@@ -29,8 +29,9 @@ class App extends React.Component {
       console.log("Websocket connection closed")
     }
     socket.onmessage = (event) => {
-      console.log(event.data)
+      alert(event.data)
     }
+    setTimeout(() =>  { alert("New listing") }, 60000);
   }
 
   handleStateChange = async (newSid) => {

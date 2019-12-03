@@ -207,7 +207,6 @@ app.route("/v1/listings/:id")
             if (err) throw err;
             let result = document.value;
             res.set("Content-Type", "application/json");
-            res.status(200).send(`Channel with id "${listingID}" was deleted`);
             db.close();
           }
         );
