@@ -82,14 +82,15 @@ func (mysql *MySQLConnection) Insert(user *User) (*User, error) {
 }
 
 type UserSignIn struct {
-	ID         string
+	ID         int64
+	UserID     int64
 	SignInTime string
 	IP         string
 }
 
 func (mysql *MySQLConnection) InsertSignIn(signIn *UserSignIn) (*UserSignIn, error) {
-	insq := "insert into UserSignIns(ID, SignInTime, IP) values (?,?,?)"
-	res, err := mysql.Client.Exec(insq, signIn.ID, signIn.SignInTime, signIn.IP)
+	insq := "insert into UserSignIns(UserID, SignInTime, IP) values (?,?,?)"
+	res, err := mysql.Client.Exec(insq, signIn.UserID, signIn.SignInTime, signIn.IP)
 	if err != nil {
 		log.Println("res error", err)
 	}

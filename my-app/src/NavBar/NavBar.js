@@ -26,6 +26,9 @@ class NavBar extends Component {
               <NavLink href="/listings">Listings</NavLink>
             </NavItem>
             <NavItem>
+              <NavLink href="/add">Add Listing</NavLink>
+            </NavItem>
+            <NavItem>
               <NavLink href="/sign-in">Sign In</NavLink>
             </NavItem>
             <NavItem>

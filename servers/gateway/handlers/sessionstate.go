@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"assignments-thebriando/servers/gateway/models/users"
+	"UW-Marketplace/servers/gateway/models/users"
 	"time"
 )
 
