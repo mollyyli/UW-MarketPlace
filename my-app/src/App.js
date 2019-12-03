@@ -31,7 +31,7 @@ class App extends React.Component {
     return (
       <Router>
         <NavBar sid={this.state.sid} handleStateChange={this.handleStateChange} />
-        <Route path="/home" component={Splash} />
+        <Route exact path="/" component={Splash} />
         <Route path="/listings" component={Listings} />
         <Route path="/sign-in" render={(props) => <Signin {...props} handleStateChange={this.handleStateChange} />} />
 
