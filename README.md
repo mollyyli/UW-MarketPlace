@@ -46,10 +46,10 @@ User : {
 ![table](table.png)
 
 
-post user
-post session
-post listing for user
-get all listings for user
+# post user
+# post session
+# post listing for user
+# get all listings for user
 
 
 
