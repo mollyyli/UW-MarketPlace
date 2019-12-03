@@ -5,6 +5,7 @@ import {
 import { Link } from 'react-router-dom';
 import "./ListingInfo.css";
 import '../App.css';
+import { CardBody } from 'react-bootstrap/Card';
 
 class ListingInfo extends Component {
   constructor(props) {
