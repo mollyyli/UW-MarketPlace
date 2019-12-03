@@ -28,7 +28,7 @@ class ListingInfo extends Component {
         'Content-Type': 'application/json'
       }
     });
-    const listing = await response.json();
+    const listing = await (response.json());
     console.log(listing)
     this.setState({ listing: listing, loading: false });
   }
@@ -41,11 +41,13 @@ class ListingInfo extends Component {
               <Spinner style={{ width: '8rem', height: '8rem' }} color="primary" />
             </div> :
             <div>
-              <h1>{this.state.listing.title}</h1>
-              <div>{this.state.listing.description}</div>
-              <div>{this.state.listing.contact}</div>
-              <div>{this.state.listing.location}</div>
-              <div>${this.state.listing.price}</div>
+              <div className="listing-body">
+                <h1>{this.state.listing.title}</h1>
+                <div>{this.state.listing.description}</div>
+                <div>{this.state.listing.contact}</div>
+                <div>{this.state.listing.location}</div>
+                <div>${this.state.listing.price}</div>
+              </div>
               <Button onClick={this.goBack}>
                 Back
               </Button>

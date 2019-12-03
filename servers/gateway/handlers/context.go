@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	fakeusers "assignments-thebriando/servers/gateway/models/fake_users"
-	"assignments-thebriando/servers/gateway/models/users"
-	"assignments-thebriando/servers/gateway/sessions"
+	fakeusers "UW-Marketplace/servers/gateway/models/fake_users"
+	"UW-Marketplace/servers/gateway/models/users"
+	"UW-Marketplace/servers/gateway/sessions"
 	"time"
 )
 

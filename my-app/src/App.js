@@ -7,6 +7,7 @@ import './App.css';
 import Listings from './Listings/Listings';
 import ListingInfo from './ListingInfo/ListingInfo';
 import SignUp from './SignUp/SignUp';
+import AddListing from './AddListing/AddListing';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/listings" component={Listings} />
       <Route path="/listing/:listingID" component={ListingInfo} />
       <Route path="/sign-up" component={SignUp} />
+      <Route path="/add" component={AddListing} />
     </Router>
     // </div>
   );
