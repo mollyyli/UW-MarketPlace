@@ -25,8 +25,6 @@ As developers we want to create this application because we think it would be a 
 * PATCH v1/listings/{ID}. Edits listing at given ID TODO
 * DELETE v1/listings/{ID}. Deletes listing at given ID TODO
 
-### FRONT TODO
-* NAVBAR USER LISTINGS
 ### Database schemas
 Listing : {
 	ID: string
