@@ -171,6 +171,7 @@ app.route("/v1/listings/:id")
       }
     });
   })
+  
 app.route("/v1/listings/creator/:id")
   .get((req, res) => {
     MongoClient.connect(url, (err, db) => {

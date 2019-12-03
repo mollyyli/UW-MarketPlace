@@ -10,6 +10,7 @@ import ListingInfo from './ListingInfo/ListingInfo';
 import SignUp from './SignUp/SignUp';
 import AddListing from './AddListing/AddListing';
 import MyListings from './MyListings/MyListings'
+import EditListings from './EditListings/EditListings'
 
 class App extends React.Component {
   constructor(props) {
@@ -37,6 +38,7 @@ class App extends React.Component {
         <Route path="/sign-up" component={SignUp} />
         <Route path="/add" render={(props) => <AddListing {...props} sid={this.state.sid} />} />
         <Route path="/my-listings" render={(props) => <MyListings {...props} sid={this.state.sid} />} />
+        <Route path="/edit/:listingID" render={(props) => <EditListings {...props} sid={this.state.sid} />}></Route>
       </Router>
       // </div>
     );
