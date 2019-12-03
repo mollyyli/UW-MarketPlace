@@ -31,7 +31,7 @@ class NavBar extends Component {
       <div className="NavBar">
         <header>
           <Navbar color="light" light expand="md">
-            <NavbarBrand href="/">UW Marketplace</NavbarBrand>
+            <NavbarBrand href="/home">UW Marketplace</NavbarBrand>
             <Nav className="mr-auto" navbar>
               <NavItem>
                 <NavLink href="/listings">Listings</NavLink>
