@@ -1,7 +1,7 @@
 package fakeusers
 
 import (
-	"assignments-thebriando/servers/gateway/models/users"
+	"UW-Marketplace/servers/gateway/models/users"
 	"errors"
 
 	"golang.org/x/crypto/bcrypt"
@@ -47,17 +47,20 @@ func ConnectToFakeDB() (*FakeMySQLConnection, error) {
 	}
 	signIns := []*users.UserSignIn{
 		&users.UserSignIn{
-			ID:         "1",
+			ID:         0,
+			UserID:     int64(1),
 			SignInTime: "07/01/2019 10:08:24 AM",
 			IP:         "155.187.132.4",
 		},
 		&users.UserSignIn{
-			ID:         "2",
+			ID:         0,
+			UserID:     int64(2),
 			SignInTime: "07/02/2019 10:08:24 AM",
 			IP:         "155.187.132.5",
 		},
 		&users.UserSignIn{
-			ID:         "3",
+			ID:         0,
+			UserID:     int64(3),
 			SignInTime: "07/03/2019 10:08:24 AM",
 			IP:         "155.187.132.6",
 		},

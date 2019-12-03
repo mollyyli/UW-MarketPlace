@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"assignments-thebriando/servers/gateway/sessions"
+	"UW-Marketplace/servers/gateway/sessions"
 	"fmt"
 	"net/http"
 	"sync"

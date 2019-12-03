@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"assignments-thebriando/servers/gateway/models/users"
-	"assignments-thebriando/servers/gateway/sessions"
+	"UW-Marketplace/servers/gateway/models/users"
+	"UW-Marketplace/servers/gateway/sessions"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -44,6 +44,9 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 						log.Println("siderr", err)
 						log.Println("user", user)
 						insertedUser, err := ctx.UserStore.Insert(user)
+						if err != nil {
+							log.Println("Insert error", err)
+						}
 						sessionState.User = *insertedUser
 						log.Println("sessionState", sessionState)
 						log.Println("save", ctx.SessionStore.Save(sid, &sessionState))
@@ -160,9 +163,10 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 				if len(headerIP) != 0 {
 					currentIP = headerIP
 				}
-				strID := strconv.FormatInt(user.ID, 10)
+				// strID := strconv.FormatInt(user.ID, 10)
 				signIn := users.UserSignIn{
-					ID:         strID,
+					ID:         int64(0),
+					UserID:     user.ID,
 					SignInTime: time.Now().String(),
 					IP:         currentIP,
 				}
@@ -184,7 +188,13 @@ func (ctx *Context) SpecificSessionHandler(w http.ResponseWriter, r *http.Reques
 			w.Write([]byte("Access forbidden"))
 
 		} else {
-			sessions.EndSession(r, ctx.SigningKey, ctx.SessionStore)
+			sid, err := sessions.EndSession(r, ctx.SigningKey, ctx.SessionStore)
+			if err != nil {
+				log.Println(sid)
+				log.Println(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
 			w.Write([]byte("Signed out"))
 		}
 	} else {

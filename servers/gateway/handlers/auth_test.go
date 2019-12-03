@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"assignments-thebriando/servers/gateway/models/users"
-	"assignments-thebriando/servers/gateway/sessions"
+	"UW-Marketplace/servers/gateway/models/users"
+	"UW-Marketplace/servers/gateway/sessions"
 	"bytes"
 	"encoding/json"
 	"io/ioutil"

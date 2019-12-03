@@ -1,9 +1,9 @@
 package main
 
 import (
-	"assignments-thebriando/servers/gateway/handlers"
-	"assignments-thebriando/servers/gateway/models/users"
-	"assignments-thebriando/servers/gateway/sessions"
+	"UW-Marketplace/servers/gateway/handlers"
+	"UW-Marketplace/servers/gateway/models/users"
+	"UW-Marketplace/servers/gateway/sessions"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -37,15 +37,16 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func CustomDirector(targets []*url.URL, rc *sessions.RedisStore) Director {
+func CustomDirector(targets []*url.URL, signingKey string, rc *sessions.RedisStore) Director {
 	var counter int32
 	counter = 0
 	return func(r *http.Request) {
-		sid := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer")
+		// sid := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer")
 		var currentSession handlers.SessionState
-		err := rc.Get(sessions.SessionID(sid), &currentSession)
+		_, err := sessions.GetState(r, signingKey, rc, &currentSession)
+		// err := rc.Get(sessions.SessionID(sid), &currentSession)
 		if &currentSession.User == nil || err != nil {
-			// r.Header.Del("X-User")
+			r.Header.Del("X-User")
 		} else {
 			encodedUser, err := json.Marshal(currentSession.User)
 			if err != nil {
@@ -105,8 +106,8 @@ func main() {
 		Addr: REDISADDR,
 	})
 	redisStore := sessions.NewRedisStore(red, time.Hour)
-	listingProxy := &httputil.ReverseProxy{Director: CustomDirector(LISTINGADDR, redisStore)}
-	summaryProxy := &httputil.ReverseProxy{Director: CustomDirector(SUMMARYADDR, redisStore)}
+	listingProxy := &httputil.ReverseProxy{Director: CustomDirector(LISTINGADDR, SESSIONKEY, redisStore)}
+	summaryProxy := &httputil.ReverseProxy{Director: CustomDirector(SUMMARYADDR, SESSIONKEY, redisStore)}
 	db, err := sql.Open("mysql", DSN)
 	if err != nil {
 		log.Println("error opening database")
@@ -120,7 +121,7 @@ func main() {
 		SockStore:    *new(handlers.SocketStore),
 	}
 
-	conn, err := amqp.Dial("amqp://" + RABBITMQADDR)
+	conn, err := amqp.Dial("amqp://" + RABBITMQADDR + ":5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -174,6 +175,7 @@ func main() {
 	mux.HandleFunc("/v1/sessions", ctx.SessionsHandler)
 	mux.HandleFunc("/v1/sessions/", ctx.SpecificSessionHandler)
 	mux.Handle("/v1/listings", listingProxy)
+	mux.Handle("/v1/listings/", listingProxy)
 	// mux.Handle("/v1/channels", messageeProxy)
 	mux.Handle("/v1/summary", summaryProxy)
 	mux.HandleFunc("/v1/ws", ctx.SocketHandler)

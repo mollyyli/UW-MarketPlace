@@ -67,10 +67,42 @@ app.route("/v1/listings")
         });
     });
   })
+app.route("/v1/listings").post((req, res) => {
+  // if (!req.get("X-User") || req.get("X-User").length == 0) {
+  //   res.status(401).send("Unauthorized");
+  //   return;
+  // }
+  // let reqUserID = JSON.parse(req.header("X-User")).id;
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err;
+    let dbo = db.db("mydb");
+    let listingObj = req.body;
+    listingObj.title = req.body.title;
+    listingObj.description = req.body.description;
+    listingObj.condition = req.body.condition;
+    listingObj.price = req.body.price;
+    listingObj.location = req.body.location;
+    listingObj.contact = req.body.contact;
+    // listingObj.creator = reqUserID;
+    dbo.collection("listings").insertOne(listingObj, async function (err, result) {
+      if (err) throw err;
+      db.close();
+      res.status(201);
+      res.set("Content-Type", "application/json");
+      console.log("listingObj", listingObj)
+      // console.log("result", result)
+      res.json(listingObj);
+    });
+  });
+})
 app.route("/v1/listings/:id")
   .get((req, res) => {
-    if (!req.get("X-User") || req.get("X-User").length == 0) {
-      res.status(401).send("Unauthorized");
+    // if (!req.get("X-User") || req.get("X-User").length == 0) {
+    //   res.status(401).send("Unauthorized");
+    //   return;
+    // }
+    if (req.params.id.length != 24) {
+      res.status(403).send("Invalid listing ID");
       return;
     }
     MongoClient.connect(url, (err, db) => {
@@ -78,14 +110,20 @@ app.route("/v1/listings/:id")
       let dbo = db.db("mydb");
       dbo
         .collection("listings")
-        .find({ _id: req.params.id })
-        .toArray(function (err, result) {
+        .findOne({ _id: new ObjectId(req.params.id) }, (err, result) => {
+          console.log("result", result)
+          console.log("req param id", req.params.id)
           if (err) throw err;
+          if (!result) {
+            res.sendStatus(404);
+            db.close();
+            return;
+          }
           res.status(200);
           res.set(contentType, appJson);
           res.json(result);
           db.close();
-        });
+        })
     })
   })
   .patch((req, res) => {

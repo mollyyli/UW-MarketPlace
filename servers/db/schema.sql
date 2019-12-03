@@ -9,7 +9,8 @@ create table if not exists Users (
 );
 
 create table if not exists UserSignIns (
-    ID int not null primary key,
+    ID int not null auto_increment primary key,
+    UserID int not null,
     SignInTime varchar(255) not null,
     IP varchar(255) not null
 );

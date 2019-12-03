@@ -6,6 +6,8 @@ import { BrowserRouter as Router, Route, Link, NavLink, Switch } from "react-rou
 import './App.css';
 import Listings from './Listings/Listings';
 import Signin from './signin/Signin';
+import ListingInfo from './ListingInfo/ListingInfo';
+import AddListing from './AddListing/AddListing';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
       <Route path="/listings" component={Listings} />
       <Route path="/sign-in" component={Signin} />
 
+      <Route path="/listing/:listingID" component={ListingInfo} />
+      <Route path="/add" component={AddListing} />
     </Router>
     // </div>
   );
