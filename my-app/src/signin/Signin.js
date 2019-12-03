@@ -42,6 +42,8 @@ class Signin extends Component {
       body: JSON.stringify(body),
     });
     const signin = await response.json();
+    console.log(response.headers.get("Authorization"));
+    this.props.handleStateChange(response.headers.get("Authorization"));
     console.log(signin)
     // this.setState({ email: signin, password: signin });
     

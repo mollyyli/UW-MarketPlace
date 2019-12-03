@@ -10,20 +10,34 @@ import ListingInfo from './ListingInfo/ListingInfo';
 import SignUp from './SignUp/SignUp';
 import AddListing from './AddListing/AddListing';
 
-function App() {
-  return (
-    // <div className="App">
-    <Router>
-      <NavBar />
-      <Route path="/listings" component={Listings} />
-      <Route path="/sign-in" component={Signin} />
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sid: ""
+    }
+  }
+  handleStateChange = (newSid) => {
+    // let sid = this.state.sid;
+    this.setState({ sid: newSid });
+    console.log(this.state.sid);
+  }
+  render() {
+    console.log(this.state.sid);
+    return (
+      // <div className="App">
+      <Router>
+        <NavBar />
+        <Route path="/listings" component={Listings} />
+        <Route path="/sign-in" render={(props) => <Signin {...props} handleStateChange={this.handleStateChange} />} />
 
-      <Route path="/listing/:listingID" component={ListingInfo} />
-      <Route path="/sign-up" component={SignUp} />
-      <Route path="/add" component={AddListing} />
-    </Router>
-    // </div>
-  );
+        <Route path="/listing/:listingID" component={ListingInfo} />
+        <Route path="/sign-up" component={SignUp} />
+        <Route path="/add" component={AddListing} />
+      </Router>
+      // </div>
+    );
+  }
 }
 
 export default App;
