@@ -178,7 +178,7 @@ app.route("/v1/listings/creator/:id")
       let dbo = db.db("mydb");
       dbo
         .collection("listings")
-        .find({creator: req.params.id})
+        .find({creator: Number(req.params.id)})
         .toArray(function (err, result) {
           if (err) throw err;
           res.status(200);
