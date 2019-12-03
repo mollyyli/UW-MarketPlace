@@ -31,6 +31,16 @@ import (
 
 type Director func(r *http.Request)
 
+type Listing struct {
+	title       string
+	description string
+	condition   string
+	price       string
+	location    string
+	contact     string
+	creator     string
+}
+
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Fatalf("%s: %s", msg, err)
@@ -152,17 +162,11 @@ func main() {
 
 	go func() {
 		for message := range msgs {
-			var msgObj struct {
-				userIDs []int
-			}
+			log.Println("message", message)
+			var msgObj Listing
 			json.Unmarshal(message.Body, &msgObj)
-			if len(msgObj.userIDs) == 0 {
-				ctx.SockStore.WriteToAllConnections(1, message.Body)
-			} else {
-				for _, userID := range msgObj.userIDs {
-					ctx.SockStore.Connections[int64(userID)].WriteMessage(1, message.Body)
-				}
-			}
+			log.Println("msgob", msgObj)
+			ctx.SockStore.WriteToAllConnections(1, message.Body)
 			// if message.Body {
 
 			// }

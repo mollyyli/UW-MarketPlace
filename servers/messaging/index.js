@@ -90,7 +90,7 @@ app.route("/v1/listings").post((req, res) => {
       db.close();
       const event = {
         type: "listing-new",
-        message: msgObj
+        message: listingObj
       };
       channel.sendToQueue(process.env.RABBITMQADDR, new Buffer(JSON.stringify(event)), { persistent: true });
       res.status(201);
@@ -132,7 +132,8 @@ app.route("/v1/listings/:id")
         })
     })
   })
-app.route("/v1/listings/:id").patch((req, res) => {
+app.route("/v1/listings/:id")
+.patch((req, res) => {
   console.log("req", req.headers)
   if (!req.get("X-User") || req.get("X-User").length == 0) {
     res.status(401).send("Unauthorized");
@@ -180,6 +181,40 @@ app.route("/v1/listings/:id").patch((req, res) => {
     }
   });
 })
+.delete((req, res) => {
+  if (!req.get("X-User") || req.get("X-User").length == 0) {
+    res.status(401).send("Unauthorized");
+    return
+  }
+  if (req.params.id.length != 24) {
+    res.status(403).send("Invalid listing ID");
+    return
+  }
+  let listingID = new mongo.ObjectId(req.params.id);
+  let reqUserID = JSON.parse(req.header("X-User")).id;
+  MongoClient.connect(url, async (err, db) => {
+    if (err) throw err;
+    let dbo = db.db("mydb");
+    const result = await dbo.collection("listings").findOne({ _id: listingID });
+    if (!result) {
+      res.status(403).send("Listing does not exist");
+    } else {
+      dbo
+        .collection("listings")
+        .findOneAndDelete(
+          { _id: listingID },
+          (err, document) => {
+            if (err) throw err;
+            let result = document.value;
+            res.set("Content-Type", "application/json");
+            res.status(200).send(`Channel with id "${listingID}" was deleted`);
+            db.close();
+          }
+        );
+    }
+  });
+})
+
 app.route("/v1/listings/creator/:id")
   .get((req, res) => {
     MongoClient.connect(url, (err, db) => {
@@ -197,6 +232,7 @@ app.route("/v1/listings/creator/:id")
         });
     })
   })
+
 
 // app
 //   .route("/v1/channels")
