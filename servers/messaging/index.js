@@ -171,6 +171,23 @@ app.route("/v1/listings/:id")
       }
     });
   })
+app.route("/v1/listings/creator/:id")
+  .get((req, res) => {
+    MongoClient.connect(url, (err, db) => {
+      if (err) throw err;
+      let dbo = db.db("mydb");
+      dbo
+        .collection("listings")
+        .find({creator: req.params.id})
+        .toArray(function (err, result) {
+          if (err) throw err;
+          res.status(200);
+          res.set(contentType, appJson);
+          res.json(result);
+          db.close();
+        });
+    })
+  })
 
 // app
 //   .route("/v1/channels")
