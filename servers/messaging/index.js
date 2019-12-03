@@ -68,6 +68,7 @@ app.route("/v1/listings")
     });
   })
 app.route("/v1/listings").post((req, res) => {
+  console.log("req", req.headers)
   if (!req.get("X-User") || req.get("X-User").length == 0) {
     res.status(401).send("Unauthorized");
     return;
@@ -127,16 +128,16 @@ app.route("/v1/listings/:id")
     })
   })
 app.route("/v1/listings/:id").patch((req, res) => {
+  console.log("req", req.headers)
   if (!req.get("X-User") || req.get("X-User").length == 0) {
     res.status(401).send("Unauthorized");
     return
   }
-  console.log(req.params)
-  if (req.params.listingID.length != 24) {
+  if (req.params.id.length != 24) {
     res.status(403).send("Invalid listing ID");
     return
   }
-  let listingID = new mongo.ObjectId(req.params.listingID);
+  let listingID = new mongo.ObjectId(req.params.id);
   let reqUserID = JSON.parse(req.header("X-User")).id;
   let reqBody = req.body;
   MongoClient.connect(url, async (err, db) => {
@@ -151,7 +152,7 @@ app.route("/v1/listings/:id").patch((req, res) => {
         .collection("listings")
         .findOneAndUpdate(
           { _id: listingID },
-          { $set: { title: reqBody.title, description: reqBody.description, condition: reqBody.condition, location: reqBody.location, price: reqBody.price } },
+          { $set: { title: reqBody.title, description: reqBody.description, condition: reqBody.condition, location: reqBody.location, contact: reqBody.contact, price: reqBody.price } },
           { returnOriginal: false },
           (err, document) => {
             if (err) throw err;

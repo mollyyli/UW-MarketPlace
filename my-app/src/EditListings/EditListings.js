@@ -14,6 +14,7 @@ class EditListings extends Component {
       condition: "",
       price: "",
       contact: "",
+      location: "",
       validated: true
     }
   }
@@ -22,31 +23,33 @@ class EditListings extends Component {
   }
   handleSubmit = async event => {
     event.preventDefault();
-    if (this.state.title && this.state.description && this.state.condition && this.state.price && this.state.contact) {
+    if (this.state.title && this.state.description && this.state.condition && this.state.price && this.state.contact && this.state.location) {
       this.setState({ validated: true });
-      const response = await fetch(`https://api.briando.me/v1/listings/${this.props.match.params.listingID}`, {
-        method: 'PATCH',
+      const listingID = this.props.match.params.listingID;
+      await fetch(`https://api.briando.me/v1/listings/${listingID}`, {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
+          "Authorization": this.props.sid
         },
         body: JSON.stringify({
           "title": this.state.title,
           "description": this.state.description,
           "condition": this.state.condition,
           "price": this.state.price,
-          "contact": this.state.contact
+          "contact": this.state.contact,
+          "location": this.state.location
         })
-      })
-      const listing = await (response.json());
-      console.log(listing);
-      this.props.history.push(`/listing/${listing._id}`)
+      });
+      // const listing = await response.json();
+      // console.log(listing);
+      this.props.history.push(`/listing/${listingID}`)
       console.log(this.state);
     } else {
       this.setState({ validated: false });
     }
   }
   render() {
-    console.log("edit props", this.props);
     return (
       <div className="ListingInfo">
         <Container>
