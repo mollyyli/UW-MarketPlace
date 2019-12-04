@@ -32,7 +32,7 @@ class App extends React.Component {
       console.log("Websocket connection closed")
     }
     socket.onmessage = (event) => {
-      alert(event.data)
+      setTimeout(() => this.setState({ show: false }), 5000)
     }
   }
 
@@ -46,7 +46,7 @@ class App extends React.Component {
   }
 
   timeout = () => {
-    setTimeout(() => this.setState({ show: false }), 2000)
+    setTimeout(() => this.setState({ show: false }), 5000)
   }
 
   render() {
