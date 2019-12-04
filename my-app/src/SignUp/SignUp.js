@@ -34,12 +34,12 @@ class SignUp extends Component {
         })
     });
     const listing = await response;
-    this.setState({loading: false});
     if (listing.status == 201) {
         this.setState({success: true})
     } else {
         this.setState({signUpAttempt: true})
     }
+    this.setState({loading: false});
     }
   render() {
     let content, signup;
