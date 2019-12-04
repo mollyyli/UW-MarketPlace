@@ -18,13 +18,30 @@ As developers we want to create this application because we think it would be a 
 
 
 ### Endpoints
-* GET v1/listings. Retrieves list of all current listings for sale
-* GET v1/listings/creator/{creatorID} Retrieves all listings of a user
-* GET v1/listings/{listingID}. Retrieves a single listing
-* POST v1/listings. Adds a listing to the database after sign-in
-* POST v1/users. Adds user to database
-* PATCH v1/listings/{ID}. Edits listing at given ID
-* DELETE v1/listings/{ID}. Deletes listing at given ID
+* POST v1/users
+	* 201 - Adds user to database - application/json
+	* 400 - Incorrect Format
+	* 415 - Unsupported media type
+* GET v1/listings
+	* 200 - returns list of all current listings for sale - application/json
+* POST v1/listings
+	* 201 - Adds a listing to the database after sign-in
+	* 400 - Incorrect Format
+	* 415 - Unsupported media type
+* GET v1/listings/creator/{creatorID}
+	* 200 - Returns all listings of an authenticated user - application/json
+	* 403 - Invalid creator ID
+* GET v1/listings/{listingID}
+	* 200 - Returns a single listing - application/json
+	* 403 - Invalid listingID
+	* 404 - Non-existent listing
+* PATCH v1/listings/{ID}
+	* 200 - Edits listing at given ID - application/json
+	* 403 - Unauthorized user/invalid listingID
+* DELETE v1/listings/{ID}
+	* 200 - Deletes listing at given ID
+	* 403 - Unauthorized user/invalid listingID
+
 
 ### Database schemas
 Listing : {
