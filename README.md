@@ -75,4 +75,4 @@ User : {
 * P1: We would authenticate without external high level libraries and instead implement user authentication from scratch. To make a listing, there would be a POST request to the server that adds it to the database. 
 
 
-* P3: The seller can then PATCH to edit the listing or DELETE to remove the listing 
+* P2: The seller can then PATCH to edit the listing or DELETE to remove the listing 
