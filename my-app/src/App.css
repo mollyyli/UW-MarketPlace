@@ -25,3 +25,7 @@
   margin-top: 30vh;
   text-align: center;
 }
+
+.listing-toast {
+  float: right;
+}

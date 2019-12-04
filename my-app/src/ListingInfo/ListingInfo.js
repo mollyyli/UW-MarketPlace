@@ -5,6 +5,7 @@ import {
 import { Link } from 'react-router-dom';
 import "./ListingInfo.css";
 import '../App.css';
+import { CardBody } from 'react-bootstrap/Card';
 
 class ListingInfo extends Component {
   constructor(props) {
@@ -29,7 +30,6 @@ class ListingInfo extends Component {
       }
     });
     const listing = await (response.json());
-    console.log(listing)
     this.setState({ listing: listing, loading: false });
   }
   render() {

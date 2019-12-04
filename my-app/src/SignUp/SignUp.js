@@ -11,12 +11,14 @@ class SignUp extends Component {
     super(props);
     this.state = {
       success: false,
-      signUpAttempt: false
+      signUpAttempt: false,
+      loading: false
     }
   }
 
   formSubmit = async (data) => {
     data.preventDefault()
+    this.setState({loading: true});
     const response = await fetch(`https://api.briando.me/v1/users`, {
         method: 'POST',
         headers: {
@@ -32,12 +34,12 @@ class SignUp extends Component {
         })
     });
     const listing = await response;
+    this.setState({loading: false});
     if (listing.status == 201) {
         this.setState({success: true})
     } else {
         this.setState({signUpAttempt: true})
     }
-    console.log(listing);
     }
   render() {
     let content, signup;
@@ -73,7 +75,7 @@ class SignUp extends Component {
             <Label for="lastname">Last Name</Label>
             <Input name="lastname" id="lastname" placeholder="last name" />
             </FormGroup>
-            <Button>Submit</Button>
+            <Button>{this.state.loading ? <Spinner size="sm" color="light" />: "Submit"}</Button>
         </Form>;
         if (this.state.signUpAttempt) {
             signup = 
@@ -84,7 +86,8 @@ class SignUp extends Component {
         
     }
     return (
-        <Container>
+        <Container className="sign-up-container">
+            <h1>Sign Up</h1>
             {signup}
             {content}
         </Container>

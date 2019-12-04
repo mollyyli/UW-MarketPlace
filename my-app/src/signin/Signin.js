@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, FormGroup, FormControl } from "react-bootstrap";
+import { Button, Input, FormGroup, Alert, Container, Spinner } from "reactstrap";
 
 import "./Signin.css";
 import '../App.css';
@@ -13,6 +13,8 @@ class Signin extends Component {
       // loading: false,
       email: '',
       password: '',
+      error: false,
+      loading: false
     }
   }
   // componentDidMount = async () => {
@@ -21,11 +23,12 @@ class Signin extends Component {
   //  await this.signin();
   // }
 
-  validateForm = async () =>  {
+  validateForm = async () => {
     return this.state.email.length > 0 && this.state.password.length > 0;
   }
 
   handleSubmit = async (event) => {
+    this.setState({ loading: true });
     // console.log(this.state.email, this.state.password);
     let body = {
       email: this.state.email,
@@ -36,18 +39,16 @@ class Signin extends Component {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'Access-Control-Allow-Origin': '*',
 
       },
       body: JSON.stringify(body),
     });
+    response.status !== 201 && this.setState({ error: true, loading: false })
     const signin = await response.json();
-    console.log(response.headers.get("Authorization"));
     this.props.handleStateChange(response.headers.get("Authorization"));
+    this.setState({ loading: false });
     this.props.history.push("/listings");
-    console.log(signin)
-    // this.setState({ email: signin, password: signin });
-    
+
   }
 
   handleEmailChange = (event) => {
@@ -64,42 +65,46 @@ class Signin extends Component {
 
   signin = async () => {
     // this.setState({ loading: true });
-    
+
     // this.setState({ listings: listings, loading: false });
-    
+
   }
 
   render() {
     return (
       <div className="signin">
-        <form className="email" onSubmit={this.handleSubmit}>
-          <FormGroup controlId="email">
-            <label>Email</label>
-            <FormControl
-              autoFocus
-              type="email"
-              value={this.state.email}
-              // onChange={e => setEmail(e.target.value)}
-              onChange={this.handleEmailChange}
+        <Container>
+          <h1>Sign In</h1>
+          <form className="email" onSubmit={this.handleSubmit}>
+            <FormGroup controlId="email">
+              <label>Email</label>
+              <Input
+                autoFocus
+                type="email"
+                value={this.state.email}
+                // onChange={e => setEmail(e.target.value)}
+                onChange={this.handleEmailChange}
 
-            />
-          </FormGroup>
+              />
+            </FormGroup>
 
-          <FormGroup className="password" controlId="password">
-            <label>Password</label>
-            <FormControl
-              value={this.state.password}
-              // onChange={e => setPassword(e.target.value)}
-              onChange={this.handlePasswordChange}
-              type="password"
-            />
-          </FormGroup>
+            <FormGroup className="password" controlId="password">
+              <label>Password</label>
+              <Input
+                value={this.state.password}
+                // onChange={e => setPassword(e.target.value)}
+                onChange={this.handlePasswordChange}
+                type="password"
+              />
+            </FormGroup>
 
-      
-          <Button className="button" block disabled={!this.validateForm()} type="submit">
-            Sign in
-          </Button>
-        </form>
+
+            <Button className="button" block disabled={!this.validateForm()} type="submit">
+              {!this.state.loading ? "Sign in" : <Spinner size="sm" color="light" />}
+            </Button>
+            {this.state.error && <Alert className="email-alert" color="danger">Email doesn't exist or password is incorrect.</Alert>}
+          </form>
+        </Container>
       </div>
     );
   }

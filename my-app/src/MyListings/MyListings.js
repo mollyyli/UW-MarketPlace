@@ -4,6 +4,8 @@ import {
   CardTitle, CardSubtitle, Button, Spinner
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import { array } from 'prop-types';
+import "./MyListings.css";
 
 class MyListings extends Component {
   constructor(props) {
@@ -15,7 +17,7 @@ class MyListings extends Component {
   }
 
   componentDidMount = async () => {
-    this.setState({loading: true})
+    this.setState({ loading: true })
     const userResponse = await fetch("https://api.briando.me/v1/users/me", {
       method: 'GET',
       headers: {
@@ -23,13 +25,30 @@ class MyListings extends Component {
       }
     });
     const user = await userResponse.json();
-    console.log(user)
     const listingsResponse = await fetch(`https://api.briando.me/v1/listings/creator/${user.id}`, {
       method: 'GET'
     });
     const listings = await listingsResponse.json();
     this.setState({ listings: listings, loading: false })
-    console.log(listings);
+  }
+
+  delete = async (listingID) => {
+    this.setState({ loading: true })
+    const response = await fetch(`https://api.briando.me/v1/listings/${listingID}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': this.props.sid
+      }
+    });
+    const newListings = this.state.listings;
+    for (let i = 0; i < newListings.length; i++) {
+      if (newListings[i]._id === listingID) {
+        newListings.splice(i, 1)
+        break;
+      }
+    }
+    this.setState({ listings: newListings })
+    this.setState({ loading: false })
   }
 
   render() {
@@ -37,13 +56,13 @@ class MyListings extends Component {
       this.props.history.push("/sign-in");
     }
     return (
-      <div>
+      <div className="my-listings">
         <Container>
           <h1>My Listings</h1>
           {this.state.listings.length ?
             <Row>
               {this.state.listings.map(listing => {
-                const listingRoute = `/listing/${listing._id}`;
+                const listingRoute = `/edit/${listing._id}`;
                 return (
                   <Col xs="12" sm="6" md="4" key={listing._id}>
                     <Card className="listing-card">
@@ -52,8 +71,9 @@ class MyListings extends Component {
                         <CardSubtitle>${listing.price}</CardSubtitle>
                         <CardText>{listing.description}</CardText>
                         <Link to={listingRoute}>
-                          <Button>Edit</Button>
+                          <Button className="edit-button">Edit</Button>
                         </Link>
+                        <Button onClick={() => this.delete(listing._id)}>Delete</Button>
                       </CardBody>
                     </Card>
                   </Col>
