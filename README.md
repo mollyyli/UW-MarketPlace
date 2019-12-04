@@ -17,13 +17,13 @@ As developers we want to create this application because we think it would be a 
 
 
 ### Endpoints
-* GET v1/listings. Retrieves list of all current listings for sale DONE
-* GET v1/listings/creator/{creatorID} Retrieves all listings of a user DONE
-* GET v1/listings/{listingID}. Retrieves a single listing DONE
-* POST v1/listings. Adds a listing to the database after sign-in DONE
-* POST v1/users. Adds user to database DONE
-* PATCH v1/listings/{ID}. Edits listing at given ID TODO
-* DELETE v1/listings/{ID}. Deletes listing at given ID TODO
+* GET v1/listings. Retrieves list of all current listings for sale
+* GET v1/listings/creator/{creatorID} Retrieves all listings of a user
+* GET v1/listings/{listingID}. Retrieves a single listing
+* POST v1/listings. Adds a listing to the database after sign-in
+* POST v1/users. Adds user to database
+* PATCH v1/listings/{ID}. Edits listing at given ID
+* DELETE v1/listings/{ID}. Deletes listing at given ID
 
 ### Database schemas
 Listing : {
@@ -45,13 +45,6 @@ User : {
 
 
 ![table](table.png)
-
-
-# post user
-# post session
-# post listing for user
-# get all listings for user
-
 
 
 ### User Stories
