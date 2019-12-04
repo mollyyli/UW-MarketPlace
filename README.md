@@ -54,10 +54,15 @@ Listing : {
 	Creator: string
 }
 
-User : {
-	ID: string
-	UserName: string
-}
+User : (
+    ID int not null auto_increment primary key,
+    Email varchar(128) not null,
+    PassHash varchar(64) not null,
+    Username varchar(255) not null,
+    FirstName varchar(255) not null,
+    LastName varchar(255) not null,
+    PhotoURL varchar(300) not null
+)
 
 
 <!-- ![table](table.png) -->
