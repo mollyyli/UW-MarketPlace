@@ -41,10 +41,7 @@ class EditListings extends Component {
           "location": this.state.location
         })
       });
-      // const listing = await response.json();
-      // console.log(listing);
       this.props.history.push(`/listing/${listingID}`)
-      console.log(this.state);
     } else {
       this.setState({ validated: false });
     }

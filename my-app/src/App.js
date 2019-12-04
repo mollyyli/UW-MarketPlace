@@ -34,13 +34,11 @@ class App extends React.Component {
     socket.onmessage = (event) => {
       alert(event.data)
     }
-    // setTimeout(() => { alert("New listing") }, 60000);
   }
 
   handleStateChange = async (newSid) => {
     localStorage.setItem('sid', newSid);
     this.setState({ sid: newSid })
-    console.log("handle change app state", this.state.sid);
   }
 
   handleListingEvent = async (event) => {
@@ -52,7 +50,6 @@ class App extends React.Component {
   }
 
   render() {
-    console.log("app state", this.state);
     return (
       <Router>
         <NavBar sid={this.state.sid} handleStateChange={this.handleStateChange} />

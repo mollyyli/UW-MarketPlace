@@ -25,18 +25,15 @@ class MyListings extends Component {
       }
     });
     const user = await userResponse.json();
-    console.log(user)
     const listingsResponse = await fetch(`https://api.briando.me/v1/listings/creator/${user.id}`, {
       method: 'GET'
     });
     const listings = await listingsResponse.json();
     this.setState({ listings: listings, loading: false })
-    console.log(listings);
   }
 
   delete = async (listingID) => {
     this.setState({ loading: true })
-    console.log(listingID)
     const response = await fetch(`https://api.briando.me/v1/listings/${listingID}`, {
       method: 'DELETE',
       headers: {
@@ -51,7 +48,6 @@ class MyListings extends Component {
       }
     }
     this.setState({ listings: newListings })
-    console.log("res", response)
     this.setState({ loading: false })
   }
 

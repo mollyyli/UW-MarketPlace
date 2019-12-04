@@ -11,19 +11,37 @@ Users may want to use this application because it is an online base where indivi
 As developers we want to create this application because we think it would be a great addition to student life. There is rarely a point where people are not interested in buying/selling/trading things that they have or want, and this would be a platform to mediate those exchanges. The actual transaction is not done over the application and that is attributed to the idea of being local listing application. 
 
 ## Technical Description
+
 ### Architectural Diagram
-![chart](chart.png)
+![chart](diagram.png)
 
 
 
 ### Endpoints
-* GET v1/listings. Retrieves list of all current listings for sale DONE
-* GET v1/listings/creator/{creatorID} Retrieves all listings of a user DONE
-* GET v1/listings/{listingID}. Retrieves a single listing DONE
-* POST v1/listings. Adds a listing to the database after sign-in DONE
-* POST v1/users. Adds user to database DONE
-* PATCH v1/listings/{ID}. Edits listing at given ID TODO
-* DELETE v1/listings/{ID}. Deletes listing at given ID TODO
+* POST v1/users
+	* 201 - Adds user to database - application/json
+	* 400 - Incorrect Format
+	* 415 - Unsupported media type
+* GET v1/listings
+	* 200 - returns list of all current listings for sale - application/json
+* POST v1/listings
+	* 201 - Adds a listing to the database after sign-in
+	* 400 - Incorrect Format
+	* 415 - Unsupported media type
+* GET v1/listings/creator/{creatorID}
+	* 200 - Returns all listings of an authenticated user - application/json
+	* 403 - Invalid creator ID
+* GET v1/listings/{listingID}
+	* 200 - Returns a single listing - application/json
+	* 403 - Invalid listingID
+	* 404 - Non-existent listing
+* PATCH v1/listings/{ID}
+	* 200 - Edits listing at given ID - application/json
+	* 403 - Unauthorized user/invalid listingID
+* DELETE v1/listings/{ID}
+	* 200 - Deletes listing at given ID
+	* 403 - Unauthorized user/invalid listingID
+
 
 ### Database schemas
 Listing : {
@@ -45,13 +63,6 @@ User : {
 
 
 ![table](table.png)
-
-
-# post user
-# post session
-# post listing for user
-# get all listings for user
-
 
 
 ### User Stories

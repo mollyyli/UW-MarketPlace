@@ -47,12 +47,9 @@ class AddListing extends Component {
         })
       })
       const listing = await (response.json());
-      console.log(listing);
-      console.log(this.props)
       this.props.handleListingEvent("true");
       this.props.timeout();
       this.props.history.push(`/listing/${listing._id}`)
-      console.log(this.state);
     } else {
       this.setState({ validated: false });
     }

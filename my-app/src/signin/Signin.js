@@ -39,19 +39,15 @@ class Signin extends Component {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 'Access-Control-Allow-Origin': '*',
 
       },
       body: JSON.stringify(body),
     });
     response.status !== 201 && this.setState({ error: true, loading: false })
     const signin = await response.json();
-    console.log(response.headers.get("Authorization"));
     this.props.handleStateChange(response.headers.get("Authorization"));
     this.setState({ loading: false });
     this.props.history.push("/listings");
-    console.log(signin)
-    // this.setState({ email: signin, password: signin });
 
   }
 
