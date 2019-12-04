@@ -64,9 +64,9 @@ User : {
 
 |Priority        | User          | Description  |
 | ------------- |:-------------:| -----:|
-| P0      | Buyer  | To get the current listings, a get request to the server would be made in order to send a response that contains the current listings |
-| P1      |  Seller   |    We would authenticate without external high level libraries and instead implement user authentication from scratch. To make a listing, there would be a POST request to the server that adds it to the database. |
-| P2 | Seller  | The seller can then PATCH to edit the listing or DELETE to remove the listing |
+| P0      | Buyer  | I want to view the current listings |
+| P1      |  Seller   |   I want to make a new listing to sell my items |
+| P2 | Seller  | I want to either edit or delete my listing |
 
 
 ### User Stories
