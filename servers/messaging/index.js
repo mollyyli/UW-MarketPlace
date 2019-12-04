@@ -195,6 +195,7 @@ app.route("/v1/listings/:id")
             if (err) throw err;
             let result = document.value;
             res.set("Content-Type", "application/json");
+            res.json(result);
             db.close();
           }
         );
