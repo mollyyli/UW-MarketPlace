@@ -91,7 +91,6 @@ func (s *SocketStore) RemoveConnection(connId int64) {
 }
 
 func (s *SocketStore) WriteToAllConnections(messageType int, data []byte) error {
-	log.Println("Data", data)
 	var writeError error
 
 	for _, conn := range s.Connections {
@@ -105,13 +104,10 @@ func (s *SocketStore) WriteToAllConnections(messageType int, data []byte) error 
 }
 
 func (ctx *Context) SocketHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("here")
 	var sessionState SessionState
 	sessionSid, err := sessions.GetState(r, ctx.SigningKey, ctx.SessionStore, &sessionState)
-	log.Println("sessionsid", sessionSid)
-	log.Println("sessionstate", sessionState)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		// w.WriteHeader(http.StatusUnauthorized)
 		http.Error(w, "Websocket connection refused", http.StatusUnauthorized)
 		return
 	} else {
@@ -123,12 +119,15 @@ func (ctx *Context) SocketHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			ctx.SockStore.InsertConnection(sessionState.User.ID, conn)
+			log.Println("connections", ctx.SockStore.Connections)
 			go (func(conn *websocket.Conn) {
 				defer conn.Close()
 				defer ctx.SockStore.RemoveConnection(sessionState.User.ID)
 				for {
 					messageType, p, err := conn.ReadMessage()
-					log.Println("message error", err)					// 	if err != nil {
+					log.Println("message type", messageType)
+					log.Println("message error", err)
+					// 	if err != nil {
 					// 		log.Println("Error reading message")
 					// 		break
 					// 	} else if messageType == 8 {
@@ -153,5 +152,4 @@ func (ctx *Context) SocketHandler(w http.ResponseWriter, r *http.Request) {
 			})(conn)
 		}
 	}
-}
 }

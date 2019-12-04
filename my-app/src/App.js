@@ -57,7 +57,7 @@ class App extends React.Component {
       <Router>
         <NavBar sid={this.state.sid} handleStateChange={this.handleStateChange} />
         {this.state.event == "true" && this.state.show &&
-          <Toast>
+          <Toast className="listing-toast">
             <ToastBody>
               New Listing added!
             </ToastBody>

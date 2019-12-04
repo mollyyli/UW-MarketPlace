@@ -36,7 +36,7 @@ const EditListingForm = ({
         <Label for="location">Location</Label>
         <Input name="location" value={location} onChange={onHandleInputChange} />
       </FormGroup>
-      <Button type="submit">Edit Listing</Button>
+      <Button type="submit" disabled={!title || !description || !condition || !price || !contact || !location}>Edit Listing</Button>
     </Form>
   );
 

@@ -5,6 +5,7 @@ import {
 } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { array } from 'prop-types';
+import "./MyListings.css";
 
 class MyListings extends Component {
   constructor(props) {
@@ -59,7 +60,7 @@ class MyListings extends Component {
       this.props.history.push("/sign-in");
     }
     return (
-      <div>
+      <div className="my-listings">
         <Container>
           <h1>My Listings</h1>
           {this.state.listings.length ?
@@ -74,7 +75,7 @@ class MyListings extends Component {
                         <CardSubtitle>${listing.price}</CardSubtitle>
                         <CardText>{listing.description}</CardText>
                         <Link to={listingRoute}>
-                          <Button>Edit</Button>
+                          <Button className="edit-button">Edit</Button>
                         </Link>
                         <Button onClick={() => this.delete(listing._id)}>Delete</Button>
                       </CardBody>

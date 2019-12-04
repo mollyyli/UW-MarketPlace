@@ -5,7 +5,6 @@ import (
 	"UW-Marketplace/servers/gateway/sessions"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -93,17 +92,13 @@ func (ctx *Context) SpecificUserHandler(w http.ResponseWriter, r *http.Request) 
 					http.Error(w, "Can't find state", http.StatusNotFound)
 					return
 				}
-				log.Println("session state", sessionState)
 				currentUser = &sessionState.User
-				log.Println("current user", currentUser)
 				id = string(currentUser.ID)
 			} else {
 				id64, _ := strconv.ParseInt(id, 10, 64)
-				log.Println("id64", id64)
 				var err2 error
 				currentUser, err2 = ctx.UserStore.GetByID(id64)
 				if err2 != nil {
-					log.Println("err2", err2)
 					http.Error(w, "No user found with ID", http.StatusNotFound)
 					return
 				}
@@ -260,10 +255,8 @@ func (ctx *Context) SpecificSessionHandler(w http.ResponseWriter, r *http.Reques
 			w.Write([]byte("Access forbidden"))
 
 		} else {
-			sid, err := sessions.EndSession(r, ctx.SigningKey, ctx.SessionStore)
+			_, err := sessions.EndSession(r, ctx.SigningKey, ctx.SessionStore)
 			if err != nil {
-				log.Println(sid)
-				log.Println(err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
