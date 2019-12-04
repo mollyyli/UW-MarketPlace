@@ -71,7 +71,8 @@ User : (
 | ------------- |:-------------:| -----:|
 | P0      | Buyer  | I want to view the current listings |
 | P1      |  Seller   |   I want to make a new listing to sell my items |
-| P2 | Seller  | I want to either edit or delete my listing |
+| P2 | Seller  | I want to edit my listing |
+| P3 | Seller  | I want to delete my listing |
 
 
 ### User Stories
@@ -79,5 +80,6 @@ User : (
 
 * P1: We would authenticate without external high level libraries and instead implement user authentication from scratch. To make a listing, there would be a POST request to the server that adds it to the database. 
 
+* P2: The seller can then PATCH to edit the listing 
 
-* P2: The seller can then PATCH to edit the listing or DELETE to remove the listing 
+* P3: The seller can then DELETE to remove the listing 
