@@ -11,8 +11,9 @@ Users may want to use this application because it is an online base where indivi
 As developers we want to create this application because we think it would be a great addition to student life. There is rarely a point where people are not interested in buying/selling/trading things that they have or want, and this would be a platform to mediate those exchanges. The actual transaction is not done over the application and that is attributed to the idea of being local listing application. 
 
 ## Technical Description
+
 ### Architectural Diagram
-![chart](chart.png)
+![chart](diagram.png)
 
 
 
