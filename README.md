@@ -40,6 +40,9 @@ As developers we want to create this application because we think it would be a 
 * DELETE v1/listings/{ID}
 	* 200 - Deletes listing at given ID
 	* 403 - Unauthorized user/invalid listingID
+### Features
+* Websockets - Notification toast pops up for added listings
+* Authentication - User signup/signin
 
 
 ### Database schemas
